@@ -1,0 +1,6 @@
+{
+  "name": "Sonderly - Journal & Gemini Reflections",
+  "description": "User-authenticated AI journaling web application with Firebase Auth, user-isolated Firestore persistence, and server-side Gemini 3.6 Flash reflections.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
