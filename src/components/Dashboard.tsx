@@ -4,7 +4,7 @@ import { JournalEditor } from './JournalEditor';
 import { GeminiConversation } from './GeminiConversation';
 import { EntryHistory } from './EntryHistory';
 import { saveJournalEntry, deleteJournalEntry, subscribeToUserEntries } from '../lib/firebase';
-import { requestGeminiReflection, requestGeminiSummary, requestGeminiTitle } from '../lib/geminiClient';
+import { requestGeminiReflection, requestGeminiSummary, requestGeminiTitle, requestGeminiEmbedding } from '../lib/geminiClient';
 import { AlertCircle, RefreshCw } from 'lucide-react';
 
 interface DashboardProps {
@@ -103,9 +103,27 @@ export const Dashboard: React.FC<DashboardProps> = ({
         finalTitle = `Reflection on ${new Date(activeEntry.createdAt).toLocaleDateString()}`;
       }
 
+      let finalEmbedding = activeEntry.embedding;
+      let finalEmbeddingModel = activeEntry.embeddingModel;
+
+      // Generate text embedding vector using server-side Gemini embedding model
+      if (activeEntry.content.trim()) {
+        try {
+          const embedRes = await requestGeminiEmbedding(activeEntry.content.trim());
+          if (embedRes?.embedding && Array.isArray(embedRes.embedding)) {
+            finalEmbedding = embedRes.embedding;
+            finalEmbeddingModel = embedRes.modelUsed;
+          }
+        } catch (embedErr) {
+          console.warn('Embedding generation notice (proceeding with entry save):', embedErr);
+        }
+      }
+
       const entryToSave: JournalEntry = {
         ...activeEntry,
         title: finalTitle,
+        embedding: finalEmbedding,
+        embeddingModel: finalEmbeddingModel,
         updatedAt: Date.now(),
       };
 

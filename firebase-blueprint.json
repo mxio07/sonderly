@@ -1,0 +1,130 @@
+{
+  "entities": {
+    "UserProfile": {
+      "title": "UserProfile",
+      "description": "User account profile information",
+      "type": "object",
+      "properties": {
+        "uid": {
+          "type": "string",
+          "description": "Unique user identifier"
+        },
+        "email": {
+          "type": "string",
+          "description": "User email address"
+        },
+        "displayName": {
+          "type": "string",
+          "description": "User display name"
+        },
+        "photoURL": {
+          "type": "string",
+          "description": "User avatar profile image URL"
+        },
+        "lastLogin": {
+          "type": "number",
+          "description": "Timestamp of last login in epoch milliseconds"
+        }
+      },
+      "required": ["uid"]
+    },
+    "JournalEntry": {
+      "title": "JournalEntry",
+      "description": "Personal journal reflection entry with chat history and semantic embedding vector",
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique journal entry identifier"
+        },
+        "userId": {
+          "type": "string",
+          "description": "Owner Google User UID"
+        },
+        "title": {
+          "type": "string",
+          "description": "Title of the reflection entry"
+        },
+        "content": {
+          "type": "string",
+          "description": "Journal text body"
+        },
+        "createdAt": {
+          "type": "number",
+          "description": "Creation timestamp in epoch milliseconds"
+        },
+        "updatedAt": {
+          "type": "number",
+          "description": "Last updated timestamp in epoch milliseconds"
+        },
+        "tags": {
+          "type": "array",
+          "description": "Thematic tags associated with the entry"
+        },
+        "mood": {
+          "type": "string",
+          "description": "Mood or emotional state associated with the reflection"
+        },
+        "summaryData": {
+          "type": "object",
+          "description": "Structured AI summary and cognitive insight metadata"
+        },
+        "messages": {
+          "type": "array",
+          "description": "Conversation turns with the Sonderly AI mentor"
+        },
+        "embedding": {
+          "type": "array",
+          "description": "Text embedding vector generated via server-side Gemini embedding model for semantic search"
+        },
+        "embeddingModel": {
+          "type": "string",
+          "description": "The Gemini embedding model name used to generate the vector"
+        }
+      },
+      "required": ["id", "userId", "content", "createdAt", "updatedAt"]
+    },
+    "InteractionLog": {
+      "title": "InteractionLog",
+      "description": "Audit interaction log recording entry interactions",
+      "type": "object",
+      "properties": {
+        "entryId": {
+          "type": "string",
+          "description": "Associated entry ID"
+        },
+        "title": {
+          "type": "string",
+          "description": "Title of the entry"
+        },
+        "turnsCount": {
+          "type": "number",
+          "description": "Count of reflection dialogue messages"
+        },
+        "hasSummary": {
+          "type": "boolean",
+          "description": "Whether an AI qualitative summary was generated"
+        },
+        "updatedAt": {
+          "type": "number",
+          "description": "Last updated timestamp in epoch milliseconds"
+        }
+      },
+      "required": ["entryId", "updatedAt"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": "UserProfile",
+      "description": "Root user profile document"
+    },
+    "/users/{userId}/entries/{entryId}": {
+      "schema": "JournalEntry",
+      "description": "Owner-bound user journal entry documents containing reflection content and vector embeddings"
+    },
+    "/users/{userId}/interactions/{interactionId}": {
+      "schema": "InteractionLog",
+      "description": "Owner-bound interaction audit and challenge verification records"
+    }
+  }
+}

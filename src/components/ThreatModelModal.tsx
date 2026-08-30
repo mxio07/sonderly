@@ -80,15 +80,15 @@ export const ThreatModelModal: React.FC<ThreatModelModalProps> = ({ isOpen, onCl
                     <td className="p-3 font-semibold text-[#638466] flex items-center gap-1.5">
                       <Key className="w-3.5 h-3.5 text-[#B6634C]" /> Tool Execution
                     </td>
-                    <td className="p-3">Server-side API key leak or unauthorized invocation of Gemini models.</td>
-                    <td className="p-3">Gemini API key encapsulated server-side; client proxies through `/api/gemini/reflect` with resilient fallback ladder.</td>
+                    <td className="p-3">Server-side API key leak or unauthorized invocation of Gemini reflection/embedding models.</td>
+                    <td className="p-3">Gemini API key encapsulated server-side; client proxies through `/api/gemini/reflect` and `/api/gemini/embed` with multi-model fallback ladders.</td>
                     <td className="p-3 text-[#666057] font-medium">OWASP A01 / A05</td>
                   </tr>
                   <tr className="hover:bg-[#FAF9F6]">
                     <td className="p-3 font-semibold text-[#638466] flex items-center gap-1.5">
                       <Database className="w-3.5 h-3.5" /> Memory &amp; State
                     </td>
-                    <td className="p-3">Cross-user journal read/write or database record snooping.</td>
+                    <td className="p-3">Cross-user journal read/write or vector embedding data snooping.</td>
                     <td className="p-3">Owner-bound Firestore Security Rules enforcing <code>request.auth.uid == userId</code> at the collection path <code>/users/&#123;userId&#125;/...</code>.</td>
                     <td className="p-3 text-[#666057] font-medium">OWASP A01</td>
                   </tr>

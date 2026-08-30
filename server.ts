@@ -34,10 +34,47 @@ const MODEL_FALLBACK_LADDER = [
   'gemini-3.7-flash',
 ];
 
+// Resilient Embedding Fallback Ladder
+const EMBEDDING_FALLBACK_LADDER = [
+  'gemini-embedding-2-preview',
+  'gemini-embedding-exp',
+  'text-embedding-004',
+  'embedding-001',
+];
+
 interface FallbackOptions {
   contents: any;
   systemInstruction?: string;
   temperature?: number;
+}
+
+async function generateEmbeddingWithFallback(text: string): Promise<{ embedding: number[]; modelUsed: string }> {
+  const ai = getGeminiClient();
+  let lastError: any = null;
+
+  for (const model of EMBEDDING_FALLBACK_LADDER) {
+    try {
+      const response = await ai.models.embedContent({
+        model,
+        contents: text,
+      });
+
+      const resAny = response as any;
+      const values =
+        (Array.isArray(response.embeddings) && response.embeddings[0]?.values) ||
+        resAny.embedding?.values ||
+        [];
+
+      if (Array.isArray(values) && values.length > 0) {
+        return { embedding: values, modelUsed: model };
+      }
+    } catch (err: any) {
+      console.warn(`[Gemini Embedding Fallback] Model ${model} failed:`, err?.message || err);
+      lastError = err;
+    }
+  }
+
+  throw new Error(`All Gemini embedding models in fallback ladder failed. Last error: ${lastError?.message || 'Unknown error'}`);
 }
 
 async function generateContentWithFallback(options: FallbackOptions): Promise<{ text: string; modelUsed: string }> {
@@ -266,6 +303,35 @@ Strict Rules:
     console.error('Error in /api/gemini/title:', error);
     return res.status(500).json({
       error: error?.message || 'Failed to generate title',
+    });
+  }
+});
+
+// Gemini Text Embedding API (Semantic Search Infrastructure)
+app.post('/api/gemini/embed', async (req, res) => {
+  try {
+    const body = req.body && typeof req.body === 'object' ? req.body : {};
+    const text = typeof body.text === 'string' ? body.text : '';
+
+    if (!text.trim()) {
+      return res.status(400).json({ error: 'Text content is required for embedding generation' });
+    }
+
+    // Defensive length constraint for embedding generation
+    const trimmedText = text.slice(0, 10000);
+
+    const result = await generateEmbeddingWithFallback(trimmedText);
+
+    return res.json({
+      embedding: result.embedding,
+      dimensions: result.embedding.length,
+      modelUsed: result.modelUsed,
+      timestamp: new Date().toISOString(),
+    });
+  } catch (error: any) {
+    console.error('Error in /api/gemini/embed:', error);
+    return res.status(500).json({
+      error: error?.message || 'Failed to generate embedding vector',
     });
   }
 });

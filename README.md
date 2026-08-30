@@ -12,6 +12,7 @@ A secure, user-authenticated journaling web application powered by **Google Fire
 4. **Resilient Fallback Ladder**: Robust automated fallback (`gemini-3.6-flash` -> `gemini-3.1-flash-lite` -> `gemini-flash-latest` -> `gemini-3.7-flash`) with error status code recovery.
 5. **Automated Qualitative Summarization**: Instant extraction of mood/sentiment, key insight, and thematic tags.
 6. **Zero-Crash Undefined-Stripping Hygiene**: Payload sanitization before writing to Cloud Firestore.
+7. **Semantic Search Vector Embeddings**: Server-side generation of high-dimensional text embeddings (`text-embedding-004` / `gemini-embedding-2-preview`) saved alongside journal entries for future semantic similarity search.
 
 ---
 
@@ -108,3 +109,6 @@ gcloud run services update reflectai \
 | **TC-04** | **Gemini Dialogue** | Select mode, ask question, click Send. | Gemini streams empathetic response with Markdown. |
 | **TC-05** | **AI Synthesis** | Click "AI Summary". | Sentiment, key insight, and thematic tags rendered. |
 | **TC-06** | **Search & Deletion** | Filter entries by tag/keyword, delete entry. | Firestore real-time listener updates view. |
+| **TC-07** | **Vector Embedding** | Write reflection, click "Save to Firestore". | Server generates Gemini text embedding stored in Firestore `embedding` field. |
+| **TC-08** | **Semantic Search** | Type conceptual query in Past Entries, click "Semantic Search". | Server generates query embedding; user entries ranked by cosine similarity with match percentage. |
+

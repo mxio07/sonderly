@@ -91,6 +91,35 @@ const TEST_CASES: TestCase[] = [
     ],
     expectedResult: 'Real-time Firestore snapshot updates list; deleting removes the document permanently from the user collection.',
   },
+  {
+    id: 'TC-07',
+    category: 'Semantic Search Infrastructure',
+    name: 'Server-Side Vector Embedding Generation on Save',
+    precondition: 'User is writing an entry with text content.',
+    steps: [
+      'Write reflection text in the main journal textarea.',
+      'Click "Save to Firestore" (#btn-save-entry).',
+      'The client invokes `/api/gemini/embed` which computes text embeddings using Gemini embedding models (gemini-embedding-2-preview).',
+      'Verify the resulting high-dimensional vector array is stored in the "embedding" field of the entry document at `/users/{userId}/entries/{entryId}` in Firestore.',
+    ],
+    expectedResult: 'The entry is persisted with a valid numeric embedding vector stored directly inside the Firestore document for future semantic search querying.',
+  },
+  {
+    id: 'TC-08',
+    category: 'Semantic Search & Ranking',
+    name: 'Semantic Search with Cosine Similarity Ranking',
+    precondition: 'User has saved entries with vector embeddings in their private collection.',
+    steps: [
+      'Navigate to "Past Entries" tab (#nav-tab-history).',
+      'Type a conceptual query (e.g., "coping with work stress" or "gratitude and calm") into the search input (#input-history-search).',
+      'Click the "Semantic Search" button (#btn-semantic-search) or press Enter.',
+      'Observe the loader spinner ("Ranking...") while the server generates the query embedding.',
+      'Inspect the returned ranked results list, checking that entries are ordered from highest to lowest semantic similarity with rank badges (#1, #2, ...) and match percentage pills (e.g., "94% semantic match").',
+      'Click on a ranked result card to open and edit that specific entry in the journal editor.',
+      'Click "Reset to all" (#btn-clear-semantic-results) to return to the full list.',
+    ],
+    expectedResult: 'Query vector embedding is computed server-side, cosine similarity is computed across the active user’s isolated entries, and matching results are presented in descending order of relevance with match percentages.',
+  },
 ];
 
 export const TestWalkthroughModal: React.FC<TestWalkthroughModalProps> = ({ isOpen, onClose }) => {

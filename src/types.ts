@@ -28,6 +28,8 @@ export interface JournalEntry {
   summaryData?: SummaryData;
   messages: ChatMessage[];
   mood?: string;
+  embedding?: number[];
+  embeddingModel?: string;
 }
 
 export interface UserProfile {
