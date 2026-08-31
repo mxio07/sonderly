@@ -298,6 +298,8 @@ export const Dashboard: React.FC<DashboardProps> = ({
           <div className="lg:col-span-6 xl:col-span-7">
             <JournalEditor
               entry={activeEntry}
+              allEntries={entries}
+              onSelectEntry={handleSelectEntry}
               onUpdateEntry={handleUpdateEntry}
               onSaveEntry={handleSaveEntry}
               onGenerateSummary={handleGenerateSummary}

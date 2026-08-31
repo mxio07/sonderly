@@ -88,8 +88,8 @@ export const ThreatModelModal: React.FC<ThreatModelModalProps> = ({ isOpen, onCl
                     <td className="p-3 font-semibold text-[#638466] flex items-center gap-1.5">
                       <Database className="w-3.5 h-3.5" /> Memory &amp; State
                     </td>
-                    <td className="p-3">Cross-user journal read/write or vector embedding data snooping across user boundaries.</td>
-                    <td className="p-3">Owner-bound Firestore Security Rules enforcing <code>request.auth.uid == userId</code> at the collection path <code>/users/&#123;userId&#125;/...</code>. RAG search strictly computes similarity over the authenticated user's private collection.</td>
+                    <td className="p-3">Cross-user journal read/write, vector embedding data snooping, or unauthorized linkage across user boundaries in Semantic Threading / Related Reflections.</td>
+                    <td className="p-3">Owner-bound Firestore Security Rules enforcing <code>request.auth.uid == userId</code> at the collection path <code>/users/&#123;userId&#125;/...</code>. RAG search and Entry Threading strictly compute cosine similarity over the authenticated user's private collection, filtering out the active entry and suppressing sub-threshold matches.</td>
                     <td className="p-3 text-[#666057] font-medium">OWASP A01</td>
                   </tr>
                   <tr className="hover:bg-[#FAF9F6]">

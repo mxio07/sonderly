@@ -1,10 +1,28 @@
-import React, { useState, useEffect } from 'react';
-import { Sparkles, Save, Wand2, Tag, Lightbulb, Clock, Check, AlertCircle, RefreshCw, BookOpen, Layers, ExternalLink } from 'lucide-react';
+import React, { useState, useEffect, useMemo } from 'react';
+import { 
+  Sparkles, 
+  Save, 
+  Wand2, 
+  Tag, 
+  Lightbulb, 
+  Clock, 
+  Check, 
+  AlertCircle, 
+  RefreshCw, 
+  BookOpen, 
+  Layers, 
+  ExternalLink,
+  GitFork,
+  Calendar,
+  ChevronRight
+} from 'lucide-react';
 import { JournalEntry, RecommendedBook } from '../types';
-import { requestGoogleBooksBatch } from '../lib/geminiClient';
+import { requestGoogleBooksBatch, computeCosineSimilarity } from '../lib/geminiClient';
 
 interface JournalEditorProps {
   entry: JournalEntry;
+  allEntries?: JournalEntry[];
+  onSelectEntry?: (entry: JournalEntry) => void;
   onUpdateEntry: (updated: Partial<JournalEntry>) => void;
   onSaveEntry: () => Promise<void>;
   onGenerateSummary: () => Promise<void>;
@@ -59,6 +77,8 @@ const PROMPT_TEMPLATES = [
 
 export const JournalEditor: React.FC<JournalEditorProps> = ({
   entry,
+  allEntries = [],
+  onSelectEntry,
   onUpdateEntry,
   onSaveEntry,
   onGenerateSummary,
@@ -72,6 +92,50 @@ export const JournalEditor: React.FC<JournalEditorProps> = ({
   const [defaultBooksWithCovers, setDefaultBooksWithCovers] = useState<RecommendedBook[]>(DEFAULT_BOOKS);
   const [directImageFailed, setDirectImageFailed] = useState<Record<string, boolean>>({});
   const [brokenImages, setBrokenImages] = useState<Record<string, boolean>>({});
+
+  // Compute meaningfully related past reflections for the active entry using cosine similarity
+  const relatedReflections = useMemo(() => {
+    // Determine the active embedding vector for this entry
+    const currentEmbedding =
+      entry.embedding && Array.isArray(entry.embedding) && entry.embedding.length > 0
+        ? entry.embedding
+        : allEntries?.find((e) => e.id === entry.id)?.embedding;
+
+    if (!currentEmbedding || !Array.isArray(currentEmbedding) || currentEmbedding.length === 0) {
+      return [];
+    }
+
+    if (!allEntries || allEntries.length <= 1) {
+      return [];
+    }
+
+    // Filter out the active entry itself; only examine other entries belonging to the authenticated user that have embeddings
+    const otherEntries = allEntries.filter(
+      (other) =>
+        other.id !== entry.id &&
+        other.embedding &&
+        Array.isArray(other.embedding) &&
+        other.embedding.length > 0
+    );
+
+    if (otherEntries.length === 0) {
+      return [];
+    }
+
+    // Meaningful semantic similarity threshold (exclude weak or irrelevant matches)
+    const SIMILARITY_THRESHOLD = 0.65;
+
+    const scored = otherEntries
+      .map((other) => ({
+        entry: other,
+        similarity: computeCosineSimilarity(currentEmbedding, other.embedding),
+      }))
+      .filter((item) => item.similarity >= SIMILARITY_THRESHOLD)
+      .sort((a, b) => b.similarity - a.similarity)
+      .slice(0, 3); // 2-3 most relevant entries
+
+    return scored;
+  }, [entry.id, entry.embedding, allEntries]);
 
   // Asynchronously resolve default book covers via server-side Google Books API proxy if needed
   useEffect(() => {
@@ -460,6 +524,94 @@ export const JournalEditor: React.FC<JournalEditorProps> = ({
                 );
               })}
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* Entry Threading / Related Reflections */}
+      {relatedReflections.length > 0 && (
+        <div id="section-related-reflections" className="mt-2 p-4 rounded-xl bg-[#FAF9F6] border border-[#EDE8E1] text-[#242220] shadow-xs space-y-3">
+          <div className="flex items-center justify-between">
+            <span className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-[#466548]">
+              <GitFork className="w-3.5 h-3.5 text-[#638466]" />
+              Related Reflections
+              <span className="text-[10px] lowercase font-normal px-2.5 py-0.5 rounded-full bg-[#E4EDE4] text-[#354E37] border border-[#D0E0D0] tracking-normal">
+                Semantic Threading
+              </span>
+            </span>
+            <span className="text-xs font-medium text-[#666057] flex items-center gap-1 bg-[#FFFFFF] px-2.5 py-1 rounded-lg border border-[#EDE8E1]">
+              <span>{relatedReflections.length} connected {relatedReflections.length === 1 ? 'reflection' : 'reflections'}</span>
+            </span>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+            {relatedReflections.map(({ entry: relatedEntry, similarity }) => {
+              const dateStr = new Date(relatedEntry.createdAt).toLocaleDateString(undefined, {
+                month: 'short',
+                day: 'numeric',
+                year: 'numeric',
+              });
+              const matchPercent = Math.round(similarity * 100);
+              const snippet =
+                relatedEntry.content.slice(0, 80) + (relatedEntry.content.length > 80 ? '...' : '');
+
+              return (
+                <div
+                  key={relatedEntry.id}
+                  id={`related-entry-card-${relatedEntry.id}`}
+                  onClick={() => onSelectEntry && onSelectEntry(relatedEntry)}
+                  className="p-3.5 rounded-xl bg-[#FFFFFF] border border-[#EDE8E1] hover:border-[#DCE8DC] hover:bg-[#F7F5F0] transition-all cursor-pointer group flex flex-col justify-between shadow-2xs"
+                  role="button"
+                  tabIndex={0}
+                  aria-label={`Open related reflection: ${relatedEntry.title || 'Untitled reflection'}`}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                      e.preventDefault();
+                      onSelectEntry && onSelectEntry(relatedEntry);
+                    }
+                  }}
+                >
+                  <div>
+                    <div className="flex items-start justify-between gap-1.5 mb-1.5">
+                      <h4 className="text-xs sm:text-sm font-bold text-[#242220] group-hover:text-[#638466] transition-colors line-clamp-1">
+                        {relatedEntry.title || 'Untitled Reflection'}
+                      </h4>
+                      <ChevronRight className="w-4 h-4 text-[#918B82] group-hover:text-[#638466] group-hover:translate-x-0.5 transition-all shrink-0 mt-0.5" />
+                    </div>
+
+                    <div className="flex items-center gap-1.5 text-[11px] text-[#666057] mb-2 font-medium">
+                      <span className="flex items-center gap-1">
+                        <Calendar className="w-3 h-3 text-[#918B82]" />
+                        {dateStr}
+                      </span>
+                      <span>•</span>
+                      <span className="text-[#466548] font-semibold bg-[#F1F6F1] px-1.5 py-0.2 rounded border border-[#DCE8DC]">
+                        {matchPercent}% match
+                      </span>
+                    </div>
+
+                    {snippet && (
+                      <p className="text-xs text-[#666057] line-clamp-2 leading-relaxed">
+                        {snippet}
+                      </p>
+                    )}
+                  </div>
+
+                  {relatedEntry.tags && relatedEntry.tags.length > 0 && (
+                    <div className="flex flex-wrap items-center gap-1 mt-2.5 pt-2 border-t border-[#F2EFE9]">
+                      {relatedEntry.tags.slice(0, 2).map((tag) => (
+                        <span
+                          key={tag}
+                          className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-[#FAF9F6] text-[#666057] border border-[#EDE8E1]"
+                        >
+                          #{tag}
+                        </span>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              );
+            })}
           </div>
         </div>
       )}

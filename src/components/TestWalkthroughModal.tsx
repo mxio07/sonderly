@@ -151,6 +151,22 @@ const TEST_CASES: TestCase[] = [
     ],
     expectedResult: 'Real book cover art is retrieved server-side from Google Books API and rendered on each deck card with cycling animations and robust fallback placeholders.',
   },
+  {
+    id: 'TC-11',
+    category: 'Semantic Threading & Discovery',
+    name: 'Entry Threading & Related Reflections Discovery',
+    precondition: 'User has multiple saved reflections with generated vector embeddings in their private collection.',
+    steps: [
+      'Open any saved journal entry from Past Entries (#nav-tab-history) into the active editor view.',
+      'Inspect the "Related Reflections" section (#section-related-reflections) rendered beneath the journal editor.',
+      'Verify that 2-3 small linked cards appear, showing the title, formatted date, and semantic match percentage of related past entries.',
+      'Verify that the current entry itself is excluded from the list.',
+      'Click on any related reflection card (#related-entry-card-*).',
+      'Verify the editor seamlessly transitions to and loads the clicked past reflection.',
+      'Open an entry with unique/unrelated topics or clear all other entries; verify the Related Reflections section is cleanly hidden (suppressed when relevance is below threshold or no connections exist).',
+    ],
+    expectedResult: 'Cosine similarity is computed over stored embedding vectors; only the current user’s own related reflections meeting relevance thresholds (>=65%) are shown; clicking immediately opens the connected entry, and unmeaningful matches are suppressed.',
+  },
 ];
 
 export const TestWalkthroughModal: React.FC<TestWalkthroughModalProps> = ({ isOpen, onClose }) => {

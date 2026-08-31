@@ -13,6 +13,7 @@ A secure, user-authenticated journaling web application powered by **Google Fire
 5. **Automated Qualitative Summarization**: Instant extraction of mood/sentiment, key insight, and thematic tags.
 6. **Zero-Crash Undefined-Stripping Hygiene**: Payload sanitization before writing to Cloud Firestore.
 7. **Semantic Search Vector Embeddings**: Server-side generation of high-dimensional text embeddings (`text-embedding-004` / `gemini-embedding-2-preview`) saved alongside journal entries for future semantic similarity search.
+8. **Entry Threading & Related Reflections**: Automatic discovery of semantically connected past reflections using cosine similarity over embeddings, seamlessly linking related thoughts over time with suppression of sub-threshold matches.
 
 ---
 
@@ -120,4 +121,5 @@ gcloud run services update reflectai \
 | **TC-08** | **Semantic Search** | Type conceptual query in Past Entries, click "Semantic Search". | Server generates query embedding; user entries ranked by cosine similarity with match percentage. |
 | **TC-09** | **Ask Your Past Self (RAG)** | Click "Ask Past Self" tab, ask question about journal history, click "Ask". | Server generates query embedding, retrieves top matching entries via cosine similarity, and Gemini synthesizes a grounded answer referencing real reflections. |
 | **TC-10** | **Recommended Reads (Google Books)** | Click "AI Summary", observe recommended books and tap stacked card deck. | Server resolves real cover images via Google Books API with cycling animation and graceful placeholder fallback. |
+| **TC-11** | **Entry Threading & Related Reflections** | Open saved journal entry in editor, inspect "Related Reflections" section, click a connected card. | Cosine similarity finds 2-3 most relevant past entries (>=65% match) from the user's private collection; clicking opens the connected entry, and unmeaningful matches are suppressed. |
 
