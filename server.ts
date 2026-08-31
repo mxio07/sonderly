@@ -2,6 +2,7 @@ import express from 'express';
 import path from 'path';
 import { createServer as createViteServer } from 'vite';
 import { GoogleGenAI } from '@google/genai';
+import { SecretManagerServiceClient } from '@google-cloud/secret-manager';
 import dotenv from 'dotenv';
 
 dotenv.config();
@@ -12,6 +13,50 @@ const PORT = 3000;
 // 1. Top-Level Request Deserialization (Ordering Guarantee)
 app.use(express.json({ limit: '5mb' }));
 app.use(express.urlencoded({ extended: true }));
+
+// Secret Manager Client & In-Memory Cache
+let secretClient: SecretManagerServiceClient | null = null;
+const secretCache = new Map<string, string>();
+
+/**
+ * Dynamically resolves secrets with prioritized server environment variables,
+ * and Google Cloud Secret Manager as the production deployment path.
+ * Ensures zero-hardcoding hygiene and production Secret Manager compliance.
+ */
+async function getSecret(secretName: string): Promise<string | null> {
+  // 1. Direct server-side environment variable lookup (working active fallback)
+  const envVal = process.env[secretName];
+  if (typeof envVal === 'string' && envVal.trim().length > 0) {
+    return envVal.trim();
+  }
+
+  // 2. Check in-memory cache
+  if (secretCache.has(secretName)) {
+    return secretCache.get(secretName)!;
+  }
+
+  // 3. Intended production method: Google Cloud Secret Manager (when enabled on GCP project)
+  try {
+    if (!secretClient) {
+      secretClient = new SecretManagerServiceClient();
+    }
+    const projectId = process.env.GOOGLE_CLOUD_PROJECT || process.env.GCP_PROJECT || (await secretClient.getProjectId().catch(() => null));
+    if (projectId) {
+      const name = `projects/${projectId}/secrets/${secretName}/versions/latest`;
+      const [version] = await secretClient.accessSecretVersion({ name });
+      const payload = version.payload?.data?.toString();
+      if (payload && payload.trim()) {
+        const cleanPayload = payload.trim();
+        secretCache.set(secretName, cleanPayload);
+        return cleanPayload;
+      }
+    }
+  } catch (err: any) {
+    // Secret Manager might not be enabled or configured in non-production environments
+  }
+
+  return null;
+}
 
 // Lazy Gemini SDK initialization
 let aiClient: GoogleGenAI | null = null;
@@ -24,6 +69,124 @@ function getGeminiClient(): GoogleGenAI {
     aiClient = new GoogleGenAI({ apiKey });
   }
   return aiClient;
+}
+
+/**
+ * Server-Side Google Books API Lookup Helper
+ * Queries Google Books API server-side using secure API key resolution.
+ * Strips dangerous characters, bounds input lengths, upgrades image URLs to HTTPS,
+ * and falls back gracefully to null on missing records or network errors.
+ */
+interface BookLookupResult {
+  title: string;
+  author: string;
+  tag?: string;
+  coverUrl: string | null;
+  infoLink: string | null;
+  description: string | null;
+}
+
+async function lookupGoogleBook(title: string, author?: string, tag?: string): Promise<BookLookupResult> {
+  const cleanTitle = (title || '').trim().slice(0, 150);
+  const cleanAuthor = (author || '').trim().slice(0, 100);
+
+  if (!cleanTitle) {
+    return {
+      title: 'Untitled Book',
+      author: cleanAuthor || 'Unknown Author',
+      tag: tag || 'Reflection',
+      coverUrl: null,
+      infoLink: null,
+      description: null,
+    };
+  }
+
+  // Internal helper to query Google Books API with authenticated API key
+  async function searchGoogleBooks(query: string, apiKey: string | null) {
+    let url = `https://www.googleapis.com/books/v1/volumes?q=${encodeURIComponent(query)}&maxResults=5&printType=books`;
+    if (apiKey) {
+      url += `&key=${encodeURIComponent(apiKey)}`;
+    }
+
+    try {
+      const res = await fetch(url, {
+        headers: { Accept: 'application/json' },
+      });
+
+      if (!res.ok) {
+        return null;
+      }
+      return await res.json();
+    } catch (fetchErr) {
+      return null;
+    }
+  }
+
+  try {
+    // Retrieve GOOGLE_BOOKS_API_KEY from server-side environment / Secret Manager
+    const booksApiKey = (await getSecret('GOOGLE_BOOKS_API_KEY')) || process.env.GOOGLE_BOOKS_API_KEY || null;
+
+    // 1. Try search with title and author
+    let query = cleanAuthor ? `${cleanTitle} ${cleanAuthor}` : cleanTitle;
+    let data: any = await searchGoogleBooks(query, booksApiKey);
+
+    // 2. If no items returned, fallback to title-only search
+    if (!data || !Array.isArray(data.items) || data.items.length === 0) {
+      data = await searchGoogleBooks(cleanTitle, booksApiKey);
+    }
+
+    if (data && Array.isArray(data.items) && data.items.length > 0) {
+      // Find the first volume in the result set that contains imageLinks
+      let selectedItem = data.items.find(
+        (it: any) => it.volumeInfo?.imageLinks?.thumbnail || it.volumeInfo?.imageLinks?.smallThumbnail || it.volumeInfo?.imageLinks?.medium
+      );
+
+      if (!selectedItem) {
+        selectedItem = data.items[0];
+      }
+
+      if (selectedItem && selectedItem.volumeInfo) {
+        const vInfo = selectedItem.volumeInfo;
+        let rawCover =
+          vInfo.imageLinks?.thumbnail ||
+          vInfo.imageLinks?.smallThumbnail ||
+          vInfo.imageLinks?.medium ||
+          vInfo.imageLinks?.large ||
+          vInfo.imageLinks?.extraLarge ||
+          null;
+
+        // Upgrade HTTP URLs to HTTPS
+        if (rawCover && typeof rawCover === 'string') {
+          rawCover = rawCover.replace(/^http:\/\//i, 'https://');
+          // Ensure zoom level 1 for crisp cover thumbnail
+          if (!rawCover.includes('zoom=')) {
+            rawCover += '&zoom=1';
+          }
+        }
+
+        return {
+          title: vInfo.title || cleanTitle,
+          author: Array.isArray(vInfo.authors) ? vInfo.authors.join(', ') : cleanAuthor || 'Unknown Author',
+          tag: tag || 'Reflection',
+          coverUrl: rawCover,
+          infoLink: typeof vInfo.infoLink === 'string' ? vInfo.infoLink.replace(/^http:\/\//i, 'https://') : null,
+          description: typeof vInfo.description === 'string' ? vInfo.description.slice(0, 300) : null,
+        };
+      }
+    }
+  } catch (err: any) {
+    console.warn(`[Google Books API] Error looking up "${cleanTitle}":`, err?.message || err);
+  }
+
+  // Graceful fallback if no item found or on error
+  return {
+    title: cleanTitle,
+    author: cleanAuthor || 'Unknown Author',
+    tag: tag || 'Reflection',
+    coverUrl: null,
+    infoLink: null,
+    description: null,
+  };
 }
 
 // 2. Resilient Model Fallback Ladder
@@ -215,7 +378,7 @@ Tone & Style Guide:
   }
 });
 
-// Gemini Summarization & Theme Extraction API
+// Gemini Summarization & Theme Extraction API (with Google Books API Cover Enrichment)
 app.post('/api/gemini/summarize', async (req, res) => {
   try {
     const body = req.body && typeof req.body === 'object' ? req.body : {};
@@ -225,16 +388,25 @@ app.post('/api/gemini/summarize', async (req, res) => {
       return res.status(400).json({ error: 'Text is required for summarization' });
     }
 
-    const systemInstruction = `You are an expert qualitative analyst and emotional intelligence coach.
+    const systemInstruction = `You are an expert qualitative analyst, bibliotherapist, and emotional intelligence coach.
 Analyze the following personal journal entry and output a structured JSON object with the following schema:
 {
   "title": "A short, evocative 3-6 word title for this entry",
   "summary": "A 2-3 sentence cohesive summary of the entry",
   "keyThemes": ["theme 1", "theme 2", "theme 3"],
   "sentiment": "Positive" | "Reflective" | "Anxious" | "Energized" | "Grateful" | "Mixed",
-  "keyInsight": "One profound one-sentence takeaway or reframing"
+  "keyInsight": "One profound one-sentence takeaway or reframing",
+  "recommendedBooks": [
+    {
+      "title": "Exact Real Book Title (e.g. Meditations)",
+      "author": "Author Name (e.g. Marcus Aurelius)",
+      "tag": "Short 2-5 word thematic connection (e.g. Stoic Resilience & Clarity)"
+    }
+  ]
 }
-Strict Rule: Respond ONLY with valid, raw JSON (no backticks or markdown fences).`;
+Strict Rules:
+- Recommend 3 real, widely recognized published books that genuinely resonate with the author's psychological reflections or challenges.
+- Respond ONLY with valid, raw JSON (no backticks or markdown fences).`;
 
     const result = await generateContentWithFallback({
       contents: [{ role: 'user', parts: [{ text }] }],
@@ -242,7 +414,7 @@ Strict Rule: Respond ONLY with valid, raw JSON (no backticks or markdown fences)
       temperature: 0.4,
     });
 
-    let parsedData = null;
+    let parsedData: any = null;
     try {
       const cleanJson = result.text.replace(/```json/gi, '').replace(/```/g, '').trim();
       parsedData = JSON.parse(cleanJson);
@@ -253,7 +425,43 @@ Strict Rule: Respond ONLY with valid, raw JSON (no backticks or markdown fences)
         keyThemes: ['Mindfulness', 'Personal Growth'],
         sentiment: 'Reflective',
         keyInsight: result.text.slice(0, 100),
+        recommendedBooks: [
+          {
+            title: 'The Courage to Be Disliked',
+            author: 'Ichiro Kishimi & Fumitake Koga',
+            tag: 'Adlerian Psychology & Self-Determination',
+          },
+          {
+            title: 'Meditations',
+            author: 'Marcus Aurelius',
+            tag: 'Stoic Perspective & Inner Resilience',
+          },
+          {
+            title: "Man's Search for Meaning",
+            author: 'Viktor E. Frankl',
+            tag: 'Existential Clarity & Purpose',
+          },
+        ],
       };
+    }
+
+    // Server-Side Google Books API Lookup: Enrich each recommended book with real cover art
+    if (Array.isArray(parsedData.recommendedBooks) && parsedData.recommendedBooks.length > 0) {
+      const enrichedBooks = await Promise.all(
+        parsedData.recommendedBooks.slice(0, 5).map(async (book: any, idx: number) => {
+          const lookup = await lookupGoogleBook(book.title, book.author, book.tag);
+          return {
+            id: `rec-book-${Date.now()}-${idx}`,
+            title: lookup.title || book.title,
+            author: lookup.author || book.author,
+            tag: lookup.tag || book.tag || 'Recommended Read',
+            coverUrl: lookup.coverUrl,
+            infoLink: lookup.infoLink,
+            description: lookup.description,
+          };
+        })
+      );
+      parsedData.recommendedBooks = enrichedBooks;
     }
 
     return res.json({
@@ -266,6 +474,93 @@ Strict Rule: Respond ONLY with valid, raw JSON (no backticks or markdown fences)
     return res.status(500).json({
       error: error?.message || 'Failed to summarize entry',
     });
+  }
+});
+
+// Google Books API Server-Side Cover Lookup Endpoints
+app.post('/api/books/cover', async (req, res) => {
+  try {
+    const body = req.body && typeof req.body === 'object' ? req.body : {};
+    const title = typeof body.title === 'string' ? body.title : '';
+    const author = typeof body.author === 'string' ? body.author : '';
+    const tag = typeof body.tag === 'string' ? body.tag : '';
+
+    if (!title.trim()) {
+      return res.status(400).json({ error: 'Book title is required' });
+    }
+
+    const result = await lookupGoogleBook(title, author, tag);
+    return res.json({ book: result });
+  } catch (error: any) {
+    console.error('Error in /api/books/cover:', error);
+    return res.status(500).json({
+      error: error?.message || 'Failed to lookup book cover',
+    });
+  }
+});
+
+app.post('/api/books/batch', async (req, res) => {
+  try {
+    const body = req.body && typeof req.body === 'object' ? req.body : {};
+    const rawBooks = Array.isArray(body.books) ? body.books.slice(0, 10) : [];
+
+    const enriched = await Promise.all(
+      rawBooks.map(async (b: any, idx: number) => {
+        const title = typeof b.title === 'string' ? b.title : '';
+        const author = typeof b.author === 'string' ? b.author : '';
+        const tag = typeof b.tag === 'string' ? b.tag : '';
+        const lookup = await lookupGoogleBook(title, author, tag);
+        return {
+          id: b.id || `book-${idx}`,
+          title: lookup.title || title,
+          author: lookup.author || author,
+          tag: lookup.tag || tag,
+          coverUrl: lookup.coverUrl,
+          infoLink: lookup.infoLink,
+          description: lookup.description,
+        };
+      })
+    );
+
+    return res.json({ books: enriched });
+  } catch (error: any) {
+    console.error('Error in /api/books/batch:', error);
+    return res.status(500).json({
+      error: error?.message || 'Failed to lookup books in batch',
+    });
+  }
+});
+
+// Secure Google Books image proxy (protects against mixed content and CORS restrictions)
+app.get('/api/books/image-proxy', async (req, res) => {
+  try {
+    const rawUrl = typeof req.query.url === 'string' ? req.query.url : '';
+    if (!rawUrl || !rawUrl.startsWith('http')) {
+      return res.status(400).send('Invalid image URL');
+    }
+
+    const parsed = new URL(rawUrl);
+    if (!parsed.hostname.endsWith('google.com') && !parsed.hostname.endsWith('googleapis.com')) {
+      return res.status(403).send('Forbidden image host');
+    }
+
+    const response = await fetch(rawUrl, {
+      headers: {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+      },
+    });
+
+    if (!response.ok) {
+      return res.status(response.status).send('Failed to fetch image from source');
+    }
+
+    const contentType = response.headers.get('content-type') || 'image/jpeg';
+    res.setHeader('Content-Type', contentType);
+    res.setHeader('Cache-Control', 'public, max-age=86400');
+    const buffer = await response.arrayBuffer();
+    return res.send(Buffer.from(buffer));
+  } catch (err: any) {
+    return res.status(500).send('Error proxying book image');
   }
 });
 

@@ -55,15 +55,22 @@ service cloud.firestore {
 
 ## 🔑 Google Cloud Secret Manager Setup
 
-Store your Gemini API key in Secret Manager and grant access to your Cloud Run service account:
+Store your Gemini API key and Google Books API key in Secret Manager and grant access to your Cloud Run service account:
 
 ```bash
-# 1. Create and populate the secret
+# 1. Create and populate the secrets
 gcloud secrets create GEMINI_API_KEY --replication-policy="automatic"
 echo -n "YOUR_GEMINI_API_KEY" | gcloud secrets versions add GEMINI_API_KEY --data-file=-
 
-# 2. Grant the default Cloud Run service account access to read the secret
+gcloud secrets create GOOGLE_BOOKS_API_KEY --replication-policy="automatic"
+echo -n "YOUR_GOOGLE_BOOKS_API_KEY" | gcloud secrets versions add GOOGLE_BOOKS_API_KEY --data-file=-
+
+# 2. Grant the default Cloud Run service account access to read the secrets
 gcloud secrets add-iam-policy-binding GEMINI_API_KEY \
+  --member="serviceAccount:YOUR_PROJECT_NUMBER-compute@developer.gserviceaccount.com" \
+  --role="roles/secretmanager.secretAccessor"
+
+gcloud secrets add-iam-policy-binding GOOGLE_BOOKS_API_KEY \
   --member="serviceAccount:YOUR_PROJECT_NUMBER-compute@developer.gserviceaccount.com" \
   --role="roles/secretmanager.secretAccessor"
 ```
@@ -84,7 +91,7 @@ gcloud run deploy reflectai \
   --platform managed \
   --region us-central1 \
   --allow-unauthenticated \
-  --set-secrets GEMINI_API_KEY=GEMINI_API_KEY:latest
+  --set-secrets GEMINI_API_KEY=GEMINI_API_KEY:latest,GOOGLE_BOOKS_API_KEY=GOOGLE_BOOKS_API_KEY:latest
 ```
 
 ### 2. Mandatory Verification Labeling
@@ -112,4 +119,5 @@ gcloud run services update reflectai \
 | **TC-07** | **Vector Embedding** | Write reflection, click "Save to Firestore". | Server generates Gemini text embedding stored in Firestore `embedding` field. |
 | **TC-08** | **Semantic Search** | Type conceptual query in Past Entries, click "Semantic Search". | Server generates query embedding; user entries ranked by cosine similarity with match percentage. |
 | **TC-09** | **Ask Your Past Self (RAG)** | Click "Ask Past Self" tab, ask question about journal history, click "Ask". | Server generates query embedding, retrieves top matching entries via cosine similarity, and Gemini synthesizes a grounded answer referencing real reflections. |
+| **TC-10** | **Recommended Reads (Google Books)** | Click "AI Summary", observe recommended books and tap stacked card deck. | Server resolves real cover images via Google Books API with cycling animation and graceful placeholder fallback. |
 

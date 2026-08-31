@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
-import { Sparkles, Save, Wand2, Tag, Lightbulb, Clock, Check, AlertCircle, RefreshCw, BookOpen, Layers } from 'lucide-react';
-import { JournalEntry } from '../types';
+import React, { useState, useEffect } from 'react';
+import { Sparkles, Save, Wand2, Tag, Lightbulb, Clock, Check, AlertCircle, RefreshCw, BookOpen, Layers, ExternalLink } from 'lucide-react';
+import { JournalEntry, RecommendedBook } from '../types';
+import { requestGoogleBooksBatch } from '../lib/geminiClient';
 
 interface JournalEditorProps {
   entry: JournalEntry;
@@ -13,24 +14,27 @@ interface JournalEditorProps {
   errorMessage?: string | null;
 }
 
-const PLACEHOLDER_BOOKS = [
+const DEFAULT_BOOKS: RecommendedBook[] = [
   {
     id: 'book-1',
     title: 'The Courage to Be Disliked',
     author: 'Ichiro Kishimi & Fumitake Koga',
     tag: 'Adlerian Psychology & Self-Determination',
+    coverUrl: null,
   },
   {
     id: 'book-2',
     title: 'Meditations',
     author: 'Marcus Aurelius',
     tag: 'Stoic Perspective & Inner Resilience',
+    coverUrl: null,
   },
   {
     id: 'book-3',
     title: "Man's Search for Meaning",
     author: 'Viktor E. Frankl',
     tag: 'Existential Clarity & Purpose',
+    coverUrl: null,
   },
 ];
 
@@ -65,6 +69,30 @@ export const JournalEditor: React.FC<JournalEditorProps> = ({
 }) => {
   const [newTagInput, setNewTagInput] = useState('');
   const [activeBookIndex, setActiveBookIndex] = useState(0);
+  const [defaultBooksWithCovers, setDefaultBooksWithCovers] = useState<RecommendedBook[]>(DEFAULT_BOOKS);
+  const [directImageFailed, setDirectImageFailed] = useState<Record<string, boolean>>({});
+  const [brokenImages, setBrokenImages] = useState<Record<string, boolean>>({});
+
+  // Asynchronously resolve default book covers via server-side Google Books API proxy if needed
+  useEffect(() => {
+    let isMounted = true;
+    async function loadDefaultCovers() {
+      try {
+        const res = await requestGoogleBooksBatch(
+          DEFAULT_BOOKS.map((b) => ({ title: b.title, author: b.author, tag: b.tag }))
+        );
+        if (isMounted && res.books && res.books.length > 0) {
+          setDefaultBooksWithCovers(res.books);
+        }
+      } catch (err) {
+        console.warn('Could not load default book covers:', err);
+      }
+    }
+    loadDefaultCovers();
+    return () => {
+      isMounted = false;
+    };
+  }, []);
 
   const wordCount = entry.content.trim() ? entry.content.trim().split(/\s+/).length : 0;
   const charCount = entry.content.length;
@@ -95,6 +123,12 @@ export const JournalEditor: React.FC<JournalEditorProps> = ({
       : templatePrompt;
     onUpdateEntry({ content: newContent });
   };
+
+  // Determine active book list: Gemini recommended books with Google Books covers or default books
+  const currentBooks: RecommendedBook[] = 
+    entry.summaryData?.recommendedBooks && entry.summaryData.recommendedBooks.length > 0
+      ? entry.summaryData.recommendedBooks
+      : defaultBooksWithCovers;
 
   return (
     <div className="bg-[#FFFFFF] border border-[#EDE8E1] rounded-2xl p-5 sm:p-6 shadow-xs flex flex-col gap-5">
@@ -246,7 +280,7 @@ export const JournalEditor: React.FC<JournalEditorProps> = ({
         />
       </div>
 
-      {/* Structured AI Summary Insights (If Generated) */}
+      {/* Structured AI Summary Insights & Recommended Reads Deck */}
       {entry.summaryData && (
         <div className="mt-2 p-4 rounded-xl bg-[#F7F5F0] border border-[#EDE8E1] text-[#242220] shadow-xs">
           <div className="flex items-center justify-between mb-2">
@@ -284,84 +318,143 @@ export const JournalEditor: React.FC<JournalEditorProps> = ({
             </div>
           )}
 
-          {/* Recommended Reads - Stacked Deck */}
-          <div className="mt-4 pt-3 border-t border-[#EDE8E1]">
-            <div className="flex items-center justify-between mb-2.5">
+          {/* Recommended Reads - Stacked Deck with Google Books Cover Art */}
+          <div className="mt-5 pt-4 border-t border-[#EDE8E1]">
+            <div className="flex items-center justify-between mb-3">
               <span className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-[#466548]">
-                <BookOpen className="w-3.5 h-3.5 text-[#638466]" />
+                <BookOpen className="w-4 h-4 text-[#638466]" />
                 Recommended Reads
+                <span className="text-[10px] lowercase font-normal px-2.5 py-0.5 rounded-full bg-[#E4EDE4] text-[#354E37] border border-[#D0E0D0] tracking-normal">
+                  Google Books API
+                </span>
               </span>
-              <span className="text-[11px] font-medium text-[#666057] flex items-center gap-1">
-                <Layers className="w-3 h-3 text-[#918B82]" />
-                <span>Card {activeBookIndex + 1} of {PLACEHOLDER_BOOKS.length} · Tap to cycle</span>
+              <span className="text-xs font-medium text-[#666057] flex items-center gap-1.5 bg-[#FAF9F6] px-2.5 py-1 rounded-lg border border-[#EDE8E1]">
+                <Layers className="w-3.5 h-3.5 text-[#638466]" />
+                <span>Card {((activeBookIndex % currentBooks.length) + 1)} of {currentBooks.length} · Tap card to cycle</span>
               </span>
             </div>
 
             <div
               id="recommended-reads-deck"
-              onClick={() => setActiveBookIndex((prev) => (prev + 1) % PLACEHOLDER_BOOKS.length)}
-              className="relative h-[88px] sm:h-[82px] w-full cursor-pointer select-none"
+              onClick={() => setActiveBookIndex((prev) => (prev + 1) % currentBooks.length)}
+              className="relative h-[156px] sm:h-[152px] w-full cursor-pointer select-none mb-3"
               role="button"
               tabIndex={0}
               aria-label="Recommended Reads stacked cards, click or tap to cycle"
               onKeyDown={(e) => {
                 if (e.key === 'Enter' || e.key === ' ') {
                   e.preventDefault();
-                  setActiveBookIndex((prev) => (prev + 1) % PLACEHOLDER_BOOKS.length);
+                  setActiveBookIndex((prev) => (prev + 1) % currentBooks.length);
                 }
               }}
             >
-              {PLACEHOLDER_BOOKS.map((book, index) => {
-                const offset = (index - activeBookIndex + PLACEHOLDER_BOOKS.length) % PLACEHOLDER_BOOKS.length;
+              {currentBooks.map((book, index) => {
+                const effectiveIndex = activeBookIndex % currentBooks.length;
+                const offset = (index - effectiveIndex + currentBooks.length) % currentBooks.length;
 
                 let zIndex = 30;
                 let transform = 'translateY(0px) scale(1)';
                 let opacity = 1;
-                let borderStyle = 'border-[#DCE8DC] bg-[#FFFFFF] shadow-xs';
+                let borderStyle = 'border-[#DCE8DC] bg-[#FFFFFF] shadow-sm';
 
                 if (offset === 1) {
                   zIndex = 20;
-                  transform = 'translateY(6px) scale(0.97)';
+                  transform = 'translateY(8px) scale(0.98)';
                   opacity = 0.88;
                   borderStyle = 'border-[#EDE8E1] bg-[#FAF9F6] shadow-xs';
                 } else if (offset === 2) {
                   zIndex = 10;
-                  transform = 'translateY(12px) scale(0.94)';
-                  opacity = 0.70;
+                  transform = 'translateY(16px) scale(0.96)';
+                  opacity = 0.72;
                   borderStyle = 'border-[#EDE8E1] bg-[#F7F4EE] shadow-xs';
+                } else if (offset > 2) {
+                  zIndex = 5;
+                  transform = 'translateY(20px) scale(0.92)';
+                  opacity = 0;
+                  borderStyle = 'border-[#EDE8E1] bg-[#F7F4EE]';
                 }
+
+                const bookKey = book.id || `book-${index}-${book.title}`;
+                const hasValidCover = book.coverUrl && !brokenImages[bookKey];
 
                 return (
                   <div
-                    key={book.id}
-                    id={`recommended-book-card-${book.id}`}
+                    key={bookKey}
+                    id={`recommended-book-card-${index}`}
                     style={{
                       zIndex,
                       transform,
                       opacity,
                     }}
-                    className={`absolute inset-x-0 top-0 rounded-xl p-3 sm:p-3.5 border transition-all duration-300 ease-out flex items-center justify-between gap-3 ${borderStyle}`}
+                    className={`absolute inset-x-0 top-0 rounded-2xl p-3.5 sm:p-4 border transition-all duration-300 ease-out flex items-center justify-between gap-3 sm:gap-4.5 ${borderStyle}`}
                   >
-                    <div className="flex items-center gap-3 min-w-0">
-                      <div className="w-8 h-8 rounded-lg bg-[#F1F6F1] border border-[#DCE8DC] flex items-center justify-center text-[#466548] shrink-0 font-bold text-xs">
-                        <BookOpen className="w-4 h-4 text-[#638466]" />
-                      </div>
-                      <div className="min-w-0">
-                        <h4 className="text-xs sm:text-sm font-bold text-[#242220] truncate leading-snug">
+                    <div className="flex items-center gap-3 sm:gap-4 min-w-0 flex-1">
+                      {/* Real Book Cover or Fallback Icon - Prominent Size */}
+                      {hasValidCover ? (
+                        <div className="w-18 h-26 sm:w-22 sm:h-29 rounded-xl overflow-hidden bg-[#FAF9F6] border border-[#DCE8DC] shadow-xs shrink-0 flex items-center justify-center">
+                          <img
+                            src={
+                              directImageFailed[bookKey]
+                                ? `/api/books/image-proxy?url=${encodeURIComponent(book.coverUrl!)}`
+                                : book.coverUrl!
+                            }
+                            alt={`Cover for ${book.title}`}
+                            referrerPolicy="no-referrer"
+                            crossOrigin="anonymous"
+                            className="w-full h-full object-cover"
+                            onError={() => {
+                              if (!directImageFailed[bookKey]) {
+                                setDirectImageFailed((prev) => ({ ...prev, [bookKey]: true }));
+                              } else {
+                                setBrokenImages((prev) => ({ ...prev, [bookKey]: true }));
+                              }
+                            }}
+                          />
+                        </div>
+                      ) : (
+                        <div className="w-18 h-26 sm:w-22 sm:h-29 rounded-xl bg-[#F1F6F1] border border-[#DCE8DC] flex flex-col items-center justify-center text-[#466548] shrink-0 font-bold text-xs gap-1.5 shadow-xs p-2 text-center">
+                          <BookOpen className="w-6 h-6 text-[#638466]" />
+                          <span className="text-[9px] font-bold text-[#638466] uppercase tracking-wider">Book</span>
+                        </div>
+                      )}
+
+                      {/* Book Details: Title, Author, Thematic Takeaway */}
+                      <div className="min-w-0 flex-1 flex flex-col justify-center">
+                        <h4 className="text-sm sm:text-base font-bold text-[#242220] leading-snug line-clamp-2">
                           {book.title}
                         </h4>
-                        <p className="text-[11px] sm:text-xs text-[#638466] font-semibold truncate">
+                        <p className="text-xs sm:text-sm text-[#466548] font-semibold mt-0.5 truncate">
                           by {book.author}
                         </p>
-                        <p className="text-[10px] text-[#666057] truncate hidden sm:block">
-                          {book.tag}
-                        </p>
+                        {book.tag && (
+                          <div className="mt-1.5 flex items-center gap-1.5">
+                            <span className="text-[11px] sm:text-xs text-[#666057] bg-[#F7F4EE] border border-[#EDE8E1] px-2.5 py-0.5 rounded-lg line-clamp-1 font-medium">
+                              {book.tag}
+                            </span>
+                          </div>
+                        )}
                       </div>
                     </div>
 
-                    <div className="shrink-0 flex items-center gap-1 text-[10px] font-semibold text-[#666057] bg-[#F7F4EE] px-2 py-1 rounded-md border border-[#EDE8E1]">
-                      <span>{index + 1}/{PLACEHOLDER_BOOKS.length}</span>
-                      <span className="hidden sm:inline">· Next ↻</span>
+                    {/* Action & Next Pill */}
+                    <div className="shrink-0 flex flex-col sm:flex-row items-end sm:items-center gap-2">
+                      {book.infoLink && (
+                        <a
+                          href={book.infoLink}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          onClick={(e) => e.stopPropagation()}
+                          title="View on Google Books"
+                          className="flex items-center gap-1 px-2.5 py-1.5 rounded-xl bg-[#FAF9F6] hover:bg-[#EDE8E1] text-[#666057] hover:text-[#242220] border border-[#EDE8E1] text-xs font-semibold transition-all cursor-pointer shadow-xs"
+                        >
+                          <span className="hidden sm:inline">Preview</span>
+                          <ExternalLink className="w-3.5 h-3.5 text-[#638466]" />
+                        </a>
+                      )}
+                      <div className="flex items-center gap-1 text-[11px] font-semibold text-[#466548] bg-[#F1F6F1] px-2.5 py-1.5 rounded-xl border border-[#DCE8DC]">
+                        <span>{index + 1}/{currentBooks.length}</span>
+                        <span className="hidden sm:inline">· Next ↻</span>
+                      </div>
                     </div>
                   </div>
                 );

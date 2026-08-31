@@ -48,6 +48,11 @@ export const EntryHistory: React.FC<EntryHistoryProps> = ({
   const [activeSemanticQuery, setActiveSemanticQuery] = useState<string | null>(null);
   const [semanticError, setSemanticError] = useState<string | null>(null);
 
+  // In-App Deletion Confirmation Modal State
+  const [entryToDelete, setEntryToDelete] = useState<{ id: string; title: string } | null>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [deleteError, setDeleteError] = useState<string | null>(null);
+
   // Extract all unique tags
   const allTags = Array.from(
     new Set(entries.flatMap((e) => e.tags || []))
@@ -120,13 +125,34 @@ export const EntryHistory: React.FC<EntryHistoryProps> = ({
 
   const handleDelete = (e: React.MouseEvent, entryId: string, title: string) => {
     e.stopPropagation();
-    if (window.confirm(`Are you sure you want to delete "${title || 'Untitled Entry'}"? This action cannot be undone.`)) {
-      onDeleteEntry(entryId);
+    setDeleteError(null);
+    setEntryToDelete({ id: entryId, title: title || 'Untitled Entry' });
+  };
+
+  const handleConfirmDelete = async () => {
+    if (!entryToDelete) return;
+    setIsDeleting(true);
+    setDeleteError(null);
+
+    try {
+      await onDeleteEntry(entryToDelete.id);
       // If currently showing semantic results, remove deleted entry from semantic list
       if (semanticResults) {
-        setSemanticResults((prev) => prev ? prev.filter((r) => r.entry.id !== entryId) : null);
+        setSemanticResults((prev) => prev ? prev.filter((r) => r.entry.id !== entryToDelete.id) : null);
       }
+      setEntryToDelete(null);
+    } catch (err: any) {
+      console.error('Failed to delete entry:', err);
+      setDeleteError(err?.message || 'Failed to delete entry. Please try again.');
+    } finally {
+      setIsDeleting(false);
     }
+  };
+
+  const handleCancelDelete = () => {
+    if (isDeleting) return;
+    setEntryToDelete(null);
+    setDeleteError(null);
   };
 
   return (
@@ -528,6 +554,72 @@ export const EntryHistory: React.FC<EntryHistoryProps> = ({
           <span className="text-[#638466] font-medium">
             User-isolated cosine similarity
           </span>
+        </div>
+      )}
+
+      {/* In-App Delete Confirmation Modal */}
+      {entryToDelete && (
+        <div
+          id="modal-delete-confirmation"
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#242220]/40 backdrop-blur-xs animate-in fade-in duration-150"
+          onClick={handleCancelDelete}
+        >
+          <div
+            className="bg-[#FFFFFF] border border-[#EDE8E1] rounded-2xl p-5 sm:p-6 max-w-sm w-full shadow-lg relative space-y-4 animate-in zoom-in-95 duration-150"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex items-start gap-3">
+              <div className="p-2.5 bg-[#FDF4F0] text-[#C46A52] rounded-xl shrink-0 border border-[#FADCD5]">
+                <Trash2 className="w-5 h-5" />
+              </div>
+              <div className="flex-1 min-w-0">
+                <h3 className="text-base font-bold text-[#242220]">
+                  Delete Reflection?
+                </h3>
+                <p className="text-xs text-[#666057] mt-1 leading-relaxed">
+                  Are you sure you want to delete <strong className="text-[#242220]">"{entryToDelete.title}"</strong>? This will permanently remove it from your Firestore journal and vector index. This action cannot be undone.
+                </p>
+              </div>
+            </div>
+
+            {deleteError && (
+              <div className="p-2.5 bg-[#FDF4F0] border border-[#FADCD5] rounded-xl flex items-center gap-2 text-xs text-[#B6634C]">
+                <AlertCircle className="w-4 h-4 shrink-0" />
+                <span>{deleteError}</span>
+              </div>
+            )}
+
+            <div className="flex items-center justify-end gap-2 pt-2 border-t border-[#EDE8E1]">
+              <button
+                id="btn-cancel-delete-modal"
+                type="button"
+                disabled={isDeleting}
+                onClick={handleCancelDelete}
+                className="px-4 py-2 text-xs font-semibold text-[#666057] hover:text-[#242220] hover:bg-[#FAF9F6] border border-[#EDE8E1] rounded-xl transition-all cursor-pointer disabled:opacity-50"
+              >
+                Cancel
+              </button>
+              <button
+                id="btn-confirm-delete-modal"
+                type="button"
+                disabled={isDeleting}
+                onClick={handleConfirmDelete}
+                className="flex items-center justify-center gap-1.5 px-4 py-2 text-xs font-semibold text-white bg-[#C46A52] hover:bg-[#B6634C] rounded-xl transition-all shadow-xs cursor-pointer disabled:opacity-50"
+              >
+                {isDeleting ? (
+                  <>
+                    <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                    <span>Deleting...</span>
+                  </>
+                ) : (
+                  <>
+                    <Trash2 className="w-3.5 h-3.5" />
+                    <span>Delete</span>
+                  </>
+                )}
+              </button>
+            </div>
+          </div>
         </div>
       )}
 

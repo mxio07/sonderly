@@ -135,6 +135,22 @@ const TEST_CASES: TestCase[] = [
     ],
     expectedResult: 'Gemini synthesizes a warm, reflective answer grounded exclusively in the user’s retrieved past reflections, respecting user isolation and prompt-injection defenses.',
   },
+  {
+    id: 'TC-10',
+    category: 'Third-Party Integration & Cover Art',
+    name: 'Recommended Reads - Google Books API Real Covers',
+    precondition: 'User writes reflection content in the editor.',
+    steps: [
+      'Type a reflection into the journal editor (#textarea-journal-content).',
+      'Click "AI Summary" (#btn-ai-summarize).',
+      'Observe Gemini generating reflection insights and tailored book recommendations.',
+      'Verify the server looks up each recommended book via Google Books API and returns real cover image URLs.',
+      'Inspect the "Recommended Reads" stacked card deck (#recommended-reads-deck) in the summary section.',
+      'Click or tap the deck to cycle through the cards and observe smooth stacking transitions with book cover images, titles, authors, and thematic pills.',
+      'Verify that if a book cover is missing or fails to load, the card gracefully falls back to the styled placeholder card without breaking the deck.',
+    ],
+    expectedResult: 'Real book cover art is retrieved server-side from Google Books API and rendered on each deck card with cycling animations and robust fallback placeholders.',
+  },
 ];
 
 export const TestWalkthroughModal: React.FC<TestWalkthroughModalProps> = ({ isOpen, onClose }) => {

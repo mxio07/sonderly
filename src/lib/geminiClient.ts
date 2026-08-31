@@ -150,3 +150,37 @@ export async function requestGeminiAskPastSelf(
   return response.json();
 }
 
+export async function requestGoogleBookCover(title: string, author?: string, tag?: string) {
+  const response = await fetch('/api/books/cover', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ title, author, tag }),
+  });
+
+  if (!response.ok) {
+    const errData = await response.json().catch(() => ({ error: 'Book lookup failed' }));
+    throw new Error(errData.error || `Server responded with status ${response.status}`);
+  }
+
+  return response.json();
+}
+
+export async function requestGoogleBooksBatch(books: Array<{ title: string; author?: string; tag?: string }>) {
+  const response = await fetch('/api/books/batch', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ books }),
+  });
+
+  if (!response.ok) {
+    const errData = await response.json().catch(() => ({ error: 'Batch book lookup failed' }));
+    throw new Error(errData.error || `Server responded with status ${response.status}`);
+  }
+
+  return response.json();
+}
+

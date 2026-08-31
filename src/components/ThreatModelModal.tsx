@@ -80,8 +80,8 @@ export const ThreatModelModal: React.FC<ThreatModelModalProps> = ({ isOpen, onCl
                     <td className="p-3 font-semibold text-[#638466] flex items-center gap-1.5">
                       <Key className="w-3.5 h-3.5 text-[#B6634C]" /> Tool Execution
                     </td>
-                    <td className="p-3">Server-side API key leak or unauthorized invocation of Gemini reflection, embedding, or RAG models.</td>
-                    <td className="p-3">Gemini API key encapsulated server-side; client proxies through `/api/gemini/reflect`, `/api/gemini/embed`, and `/api/gemini/ask-past-self` with automated multi-model fallback ladders.</td>
+                    <td className="p-3">Server-side API key leak (Gemini or Google Books) or unauthorized execution.</td>
+                    <td className="p-3">Zero hardcoded secrets; API keys resolved securely via Google Cloud Secret Manager (`getSecret`) with dev env fallback. Client proxies through `/api/gemini/*` and `/api/books/*`.</td>
                     <td className="p-3 text-[#666057] font-medium">OWASP A01 / A05</td>
                   </tr>
                   <tr className="hover:bg-[#FAF9F6]">
@@ -96,9 +96,9 @@ export const ThreatModelModal: React.FC<ThreatModelModalProps> = ({ isOpen, onCl
                     <td className="p-3 font-semibold text-[#638466] flex items-center gap-1.5">
                       <Globe className="w-3.5 h-3.5" /> Inter-System Comm
                     </td>
-                    <td className="p-3">Undefined payload crashes, credential leakage during transit.</td>
-                    <td className="p-3">Zero-crash payload sanitization (`sanitizeForFirestore`) stripping undefined properties; HTTPS transport.</td>
-                    <td className="p-3 text-[#666057] font-medium">OWASP A02</td>
+                    <td className="p-3">Third-party Google Books API injection, SSRF, mixed-content HTTP image loading, or undefined payload crashes.</td>
+                    <td className="p-3">Book title/author sanitized and length-capped; external Google Books URLs upgraded to HTTPS; zero-crash Firestore undefined property sanitization (`sanitizeForFirestore`).</td>
+                    <td className="p-3 text-[#666057] font-medium">OWASP A02 / A10</td>
                   </tr>
                 </tbody>
               </table>
