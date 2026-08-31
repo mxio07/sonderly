@@ -64,32 +64,32 @@ export const ThreatModelModal: React.FC<ThreatModelModalProps> = ({ isOpen, onCl
                     <td className="p-3 font-semibold text-[#638466] flex items-center gap-1.5">
                       <Cpu className="w-3.5 h-3.5" /> Input Surfaces
                     </td>
-                    <td className="p-3">Malicious payloads or adversarial prompt injections in journal notes.</td>
-                    <td className="p-3">Strict schema validation; user text injected as conversational data, not executable system instructions.</td>
+                    <td className="p-3">Malicious payloads, prompt injections in journal notes, or adversarial RAG questions in "Ask Your Past Self".</td>
+                    <td className="p-3">Strict schema validation; user text and questions are bounded (length-capped) and passed as data parameters, never as executable instructions.</td>
                     <td className="p-3 text-[#666057] font-medium">OWASP A03 / LLM02</td>
                   </tr>
                   <tr className="hover:bg-[#FAF9F6]">
                     <td className="p-3 font-semibold text-[#638466] flex items-center gap-1.5">
                       <AlertTriangle className="w-3.5 h-3.5 text-[#B6634C]" /> Planning &amp; Reasoning
                     </td>
-                    <td className="p-3">System prompt override or hallucinated security disclosure.</td>
-                    <td className="p-3">Explicit system role constraints isolating journal context from system operational directives.</td>
+                    <td className="p-3">Indirect prompt injection via retrieved past entries or hallucinated historical facts during RAG synthesis.</td>
+                    <td className="p-3">Strict system role framing: retrieved entries are treated as untrusted historical data; answers must be strictly grounded in what the user actually wrote or state absence honestly.</td>
                     <td className="p-3 text-[#666057] font-medium">OWASP LLM01</td>
                   </tr>
                   <tr className="hover:bg-[#FAF9F6]">
                     <td className="p-3 font-semibold text-[#638466] flex items-center gap-1.5">
                       <Key className="w-3.5 h-3.5 text-[#B6634C]" /> Tool Execution
                     </td>
-                    <td className="p-3">Server-side API key leak or unauthorized invocation of Gemini reflection/embedding models.</td>
-                    <td className="p-3">Gemini API key encapsulated server-side; client proxies through `/api/gemini/reflect` and `/api/gemini/embed` with multi-model fallback ladders.</td>
+                    <td className="p-3">Server-side API key leak or unauthorized invocation of Gemini reflection, embedding, or RAG models.</td>
+                    <td className="p-3">Gemini API key encapsulated server-side; client proxies through `/api/gemini/reflect`, `/api/gemini/embed`, and `/api/gemini/ask-past-self` with automated multi-model fallback ladders.</td>
                     <td className="p-3 text-[#666057] font-medium">OWASP A01 / A05</td>
                   </tr>
                   <tr className="hover:bg-[#FAF9F6]">
                     <td className="p-3 font-semibold text-[#638466] flex items-center gap-1.5">
                       <Database className="w-3.5 h-3.5" /> Memory &amp; State
                     </td>
-                    <td className="p-3">Cross-user journal read/write or vector embedding data snooping.</td>
-                    <td className="p-3">Owner-bound Firestore Security Rules enforcing <code>request.auth.uid == userId</code> at the collection path <code>/users/&#123;userId&#125;/...</code>.</td>
+                    <td className="p-3">Cross-user journal read/write or vector embedding data snooping across user boundaries.</td>
+                    <td className="p-3">Owner-bound Firestore Security Rules enforcing <code>request.auth.uid == userId</code> at the collection path <code>/users/&#123;userId&#125;/...</code>. RAG search strictly computes similarity over the authenticated user's private collection.</td>
                     <td className="p-3 text-[#666057] font-medium">OWASP A01</td>
                   </tr>
                   <tr className="hover:bg-[#FAF9F6]">

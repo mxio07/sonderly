@@ -3,14 +3,15 @@ import { JournalEntry, ChatMessage, ReflectionStyle, SummaryData, UserProfile } 
 import { JournalEditor } from './JournalEditor';
 import { GeminiConversation } from './GeminiConversation';
 import { EntryHistory } from './EntryHistory';
+import { AskPastSelf } from './AskPastSelf';
 import { saveJournalEntry, deleteJournalEntry, subscribeToUserEntries } from '../lib/firebase';
 import { requestGeminiReflection, requestGeminiSummary, requestGeminiTitle, requestGeminiEmbedding } from '../lib/geminiClient';
 import { AlertCircle, RefreshCw } from 'lucide-react';
 
 interface DashboardProps {
   user: UserProfile;
-  activeTab: 'write' | 'history';
-  setActiveTab: (tab: 'write' | 'history') => void;
+  activeTab: 'write' | 'history' | 'ask';
+  setActiveTab: (tab: 'write' | 'history' | 'ask') => void;
   onEntriesCountChange: (count: number) => void;
 }
 
@@ -291,7 +292,7 @@ export const Dashboard: React.FC<DashboardProps> = ({
       )}
 
       {/* Main Content Tabs */}
-      {activeTab === 'write' ? (
+      {activeTab === 'write' && (
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
           {/* Left / Top: Journal Editor */}
           <div className="lg:col-span-6 xl:col-span-7">
@@ -319,7 +320,9 @@ export const Dashboard: React.FC<DashboardProps> = ({
             />
           </div>
         </div>
-      ) : (
+      )}
+
+      {activeTab === 'history' && (
         /* History Tab */
         <div className="max-w-4xl mx-auto">
           <EntryHistory
@@ -328,6 +331,18 @@ export const Dashboard: React.FC<DashboardProps> = ({
             onSelectEntry={handleSelectEntry}
             onDeleteEntry={handleDeleteEntry}
             onNewEntry={handleNewEntry}
+            onNavigateToAsk={() => setActiveTab('ask')}
+          />
+        </div>
+      )}
+
+      {activeTab === 'ask' && (
+        /* Ask Your Past Self (RAG) Tab */
+        <div className="max-w-4xl mx-auto">
+          <AskPastSelf
+            entries={entries}
+            onSelectEntry={handleSelectEntry}
+            onNavigateToWrite={handleNewEntry}
           />
         </div>
       )}

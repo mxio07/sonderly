@@ -111,3 +111,42 @@ export function computeCosineSimilarity(vecA?: number[], vecB?: number[]): numbe
   return isNaN(similarity) ? 0 : similarity;
 }
 
+export interface ContextEntryPayload {
+  id: string;
+  title: string;
+  content: string;
+  date: string;
+  tags?: string[];
+  similarity?: number;
+}
+
+export interface AskPastSelfResponse {
+  answer: string;
+  modelUsed: string;
+  retrievedCount: number;
+  timestamp: string;
+}
+
+export async function requestGeminiAskPastSelf(
+  question: string,
+  contextEntries: ContextEntryPayload[]
+): Promise<AskPastSelfResponse> {
+  const response = await fetch('/api/gemini/ask-past-self', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      question,
+      contextEntries,
+    }),
+  });
+
+  if (!response.ok) {
+    const errData = await response.json().catch(() => ({ error: 'Network request failed' }));
+    throw new Error(errData.error || `Server responded with status ${response.status}`);
+  }
+
+  return response.json();
+}
+

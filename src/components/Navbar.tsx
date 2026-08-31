@@ -1,5 +1,5 @@
 import React from 'react';
-import { LogOut, ShieldCheck, BookOpen, PlusCircle, HelpCircle } from 'lucide-react';
+import { LogOut, ShieldCheck, BookOpen, PlusCircle, HelpCircle, Sparkles } from 'lucide-react';
 import { UserProfile } from '../types';
 import fireflyLogo from '../assets/images/sonderly_firefly_logo.jpg';
 
@@ -9,8 +9,8 @@ interface NavbarProps {
   onNewEntry: () => void;
   onOpenThreatModel: () => void;
   onOpenTestWalkthrough: () => void;
-  activeTab: 'write' | 'history';
-  setActiveTab: (tab: 'write' | 'history') => void;
+  activeTab: 'write' | 'history' | 'ask';
+  setActiveTab: (tab: 'write' | 'history' | 'ask') => void;
   entriesCount: number;
 }
 
@@ -54,7 +54,7 @@ export const Navbar: React.FC<NavbarProps> = ({
             <button
               id="nav-tab-write"
               onClick={() => setActiveTab('write')}
-              className={`flex items-center gap-2 px-3.5 py-1.5 rounded-lg text-xs sm:text-sm font-semibold transition-all cursor-pointer ${
+              className={`flex items-center gap-2 px-3 sm:px-3.5 py-1.5 rounded-lg text-xs sm:text-sm font-semibold transition-all cursor-pointer ${
                 activeTab === 'write'
                   ? 'bg-[#FFFFFF] text-[#466548] shadow-xs font-bold'
                   : 'text-[#666057] hover:text-[#242220] hover:bg-[#EDE8E1]/60'
@@ -66,7 +66,7 @@ export const Navbar: React.FC<NavbarProps> = ({
             <button
               id="nav-tab-history"
               onClick={() => setActiveTab('history')}
-              className={`flex items-center gap-2 px-3.5 py-1.5 rounded-lg text-xs sm:text-sm font-semibold transition-all cursor-pointer ${
+              className={`flex items-center gap-2 px-3 sm:px-3.5 py-1.5 rounded-lg text-xs sm:text-sm font-semibold transition-all cursor-pointer ${
                 activeTab === 'history'
                   ? 'bg-[#FFFFFF] text-[#466548] shadow-xs font-bold'
                   : 'text-[#666057] hover:text-[#242220] hover:bg-[#EDE8E1]/60'
@@ -79,6 +79,18 @@ export const Navbar: React.FC<NavbarProps> = ({
                   {entriesCount}
                 </span>
               )}
+            </button>
+            <button
+              id="nav-tab-ask"
+              onClick={() => setActiveTab('ask')}
+              className={`flex items-center gap-2 px-3 sm:px-3.5 py-1.5 rounded-lg text-xs sm:text-sm font-semibold transition-all cursor-pointer ${
+                activeTab === 'ask'
+                  ? 'bg-[#FFFFFF] text-[#466548] shadow-xs font-bold'
+                  : 'text-[#666057] hover:text-[#242220] hover:bg-[#EDE8E1]/60'
+              }`}
+            >
+              <Sparkles className="w-4 h-4 text-[#638466]" />
+              <span>Ask Past Self</span>
             </button>
           </div>
         )}

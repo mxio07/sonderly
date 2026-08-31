@@ -120,6 +120,21 @@ const TEST_CASES: TestCase[] = [
     ],
     expectedResult: 'Query vector embedding is computed server-side, cosine similarity is computed across the active user’s isolated entries, and matching results are presented in descending order of relevance with match percentages.',
   },
+  {
+    id: 'TC-09',
+    category: 'Retrieval-Augmented Generation (RAG)',
+    name: 'Ask Your Past Self - Grounded Historical Q&A',
+    precondition: 'User has saved journal entries with stored embeddings.',
+    steps: [
+      'Click the "Ask Past Self" tab in the top navigation (#nav-tab-ask) or the shortcut in Past Entries (#btn-history-goto-ask).',
+      'Type a question about past reflections into the prompt input (#input-ask-past-self) or click one of the suggested query chips.',
+      'Click "Ask" (#btn-submit-ask-past-self) or press Enter.',
+      'Observe the query embedding generation, local user-isolated cosine retrieval, and server-side grounded synthesis.',
+      'Verify the generated answer is formatted cleanly in markdown and cites specific past thoughts/dates without hallucinating events.',
+      'Check that the source entry cards appear beneath the answer with rank and similarity scores, and clicking any source card navigates directly to that entry.',
+    ],
+    expectedResult: 'Gemini synthesizes a warm, reflective answer grounded exclusively in the user’s retrieved past reflections, respecting user isolation and prompt-injection defenses.',
+  },
 ];
 
 export const TestWalkthroughModal: React.FC<TestWalkthroughModalProps> = ({ isOpen, onClose }) => {

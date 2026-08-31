@@ -22,6 +22,7 @@ interface EntryHistoryProps {
   onSelectEntry: (entry: JournalEntry) => void;
   onDeleteEntry: (entryId: string) => Promise<void>;
   onNewEntry: () => void;
+  onNavigateToAsk?: () => void;
 }
 
 interface RankedEntry {
@@ -36,6 +37,7 @@ export const EntryHistory: React.FC<EntryHistoryProps> = ({
   onSelectEntry,
   onDeleteEntry,
   onNewEntry,
+  onNavigateToAsk,
 }) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedTag, setSelectedTag] = useState<string | null>(null);
@@ -143,14 +145,28 @@ export const EntryHistory: React.FC<EntryHistoryProps> = ({
           <p className="text-xs text-[#666057] mt-0.5">Isolated &amp; stored securely in your private Cloud Firestore collection</p>
         </div>
 
-        <button
-          id="btn-history-new-entry"
-          onClick={onNewEntry}
-          className="flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-semibold bg-[#638466] hover:bg-[#527055] text-white transition-all shadow-xs cursor-pointer self-start sm:self-auto"
-        >
-          <Plus className="w-4 h-4" />
-          <span>New Entry</span>
-        </button>
+        <div className="flex items-center gap-2 self-start sm:self-auto flex-wrap">
+          {onNavigateToAsk && (
+            <button
+              id="btn-history-goto-ask"
+              onClick={onNavigateToAsk}
+              className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-semibold bg-[#F1F6F1] hover:bg-[#E3EFE3] text-[#466548] border border-[#DCE8DC] transition-all shadow-xs cursor-pointer"
+              title="Ask questions grounded in your past reflections"
+            >
+              <Sparkles className="w-3.5 h-3.5 text-[#638466]" />
+              <span>Ask Past Self</span>
+            </button>
+          )}
+
+          <button
+            id="btn-history-new-entry"
+            onClick={onNewEntry}
+            className="flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-semibold bg-[#638466] hover:bg-[#527055] text-white transition-all shadow-xs cursor-pointer"
+          >
+            <Plus className="w-4 h-4" />
+            <span>New Entry</span>
+          </button>
+        </div>
       </div>
 
       {/* Semantic Search & Filter Bar */}

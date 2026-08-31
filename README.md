@@ -111,4 +111,5 @@ gcloud run services update reflectai \
 | **TC-06** | **Search & Deletion** | Filter entries by tag/keyword, delete entry. | Firestore real-time listener updates view. |
 | **TC-07** | **Vector Embedding** | Write reflection, click "Save to Firestore". | Server generates Gemini text embedding stored in Firestore `embedding` field. |
 | **TC-08** | **Semantic Search** | Type conceptual query in Past Entries, click "Semantic Search". | Server generates query embedding; user entries ranked by cosine similarity with match percentage. |
+| **TC-09** | **Ask Your Past Self (RAG)** | Click "Ask Past Self" tab, ask question about journal history, click "Ask". | Server generates query embedding, retrieves top matching entries via cosine similarity, and Gemini synthesizes a grounded answer referencing real reflections. |
 

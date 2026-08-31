@@ -12,7 +12,7 @@ export default function App() {
   const [authLoading, setAuthLoading] = useState(true);
   const [actionLoading, setActionLoading] = useState(false);
   const [authError, setAuthError] = useState<string | null>(null);
-  const [activeTab, setActiveTab] = useState<'write' | 'history'>('write');
+  const [activeTab, setActiveTab] = useState<'write' | 'history' | 'ask'>('write');
   const [entriesCount, setEntriesCount] = useState(0);
 
   // Modals state
