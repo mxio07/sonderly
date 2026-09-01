@@ -1,44 +1,106 @@
-# Sonderly — Multi-Turn AI Journaling & Reflection Application
+# 🌤️ Sonderly — An AI Thinking Companion
 
-A secure, user-authenticated journaling web application powered by **Google Firebase Authentication**, **Cloud Firestore** (with owner-bound data isolation), and server-side **Gemini 3.6 Flash** reflections.
+> *sonder (n.) — the realization that each passer-by has a life as vivid and complex as your own.*
+> 
 
----
+Sonderly is a secure, multi-user AI application for people who want to **think things through** ; not just journal, but reflect, converse, and interrogate their own history with the help of Gemini. 
 
-## 🌟 Application Features
+It goes well beyond a simple journal: it **retrieves and reasons over your past entries**, **surfaces connections across time**, and **recommends real books matched** to what you're working through. 
 
-1. **Federated Authentication**: Passwordless Google Sign-In via Firebase Auth.
-2. **User-Isolated Firestore Storage**: Every reflection and interaction log is strictly sandboxed under `/users/{userId}/...` with locked-down security rules.
-3. **Gemini 3.6 Flash Multi-Turn Dialogue**: Conversational journal companion with 4 specialized reflection modes (*Deep Reflection*, *Creative Brainstorm*, *Socratic Prompts*, and *Synthesis*).
-4. **Resilient Fallback Ladder**: Robust automated fallback (`gemini-3.6-flash` -> `gemini-3.1-flash-lite` -> `gemini-flash-latest` -> `gemini-3.7-flash`) with error status code recovery.
-5. **Automated Qualitative Summarization**: Instant extraction of mood/sentiment, key insight, and thematic tags.
-6. **Zero-Crash Undefined-Stripping Hygiene**: Payload sanitization before writing to Cloud Firestore.
-7. **Semantic Search Vector Embeddings**: Server-side generation of high-dimensional text embeddings (`text-embedding-004` / `gemini-embedding-2-preview`) saved alongside journal entries for future semantic similarity search.
-8. **Entry Threading & Related Reflections**: Automatic discovery of semantically connected past reflections using cosine similarity over embeddings, seamlessly linking related thoughts over time with suppression of sub-threshold matches.
+All on a production-grade, user-isolated, zero-hardcoded-secrets architecture.
 
----
+Built for the **Google GenAI APAC / Cloud Run Build & Deploy Challenge**, starting from the "Personal Gemini Journal" baseline and extended into a genuinely distinct application.
 
-## 🛡️ Agentic Threat Modeling & Security Directives
+**🔗 Live app:** *Deployment in progress — link coming soon*
 
-### 1. The 5 Threat Zones Analysis
-
-| Threat Zone | Scenario / Risk | Implemented Countermeasure | OWASP Standard |
-| :--- | :--- | :--- | :--- |
-| **Input Surfaces** | Malicious injection in journal text | Schema validation; user text treated as conversational data, not instruction overrides. | OWASP A03 / LLM02 |
-| **Planning & Reasoning** | System prompt override | Explicit system role constraints isolating journal context from system directives. | OWASP LLM01 |
-| **Tool Execution** | API Key leakage or direct model misuse | API key encapsulated server-side; client calls backend proxy with resilient fallback ladder. | OWASP A01 / A05 |
-| **Memory & State** | Cross-user data snooping | Owner-bound Firestore Security Rules enforcing `request.auth.uid == userId`. | OWASP A01 |
-| **Inter-System Comm** | Undefined payload crashes & token leaks | Zero-crash payload sanitization (`sanitizeForFirestore`) and HTTPS transport. | OWASP A02 |
+**💻 Repository:** https://github.com/mxio07/sonderly
 
 ---
 
-## 🔒 Firestore Security Rules
+## ✨ What Makes Sonderly Different
 
-Deploy the following owner-bound security rules to ensure zero cross-user access:
+Being a competitive person, I did my solid research and watched my competitors closely and noticed that most submissions to this challenge stop merely at the baseline: a simple sign in, chat with Gemini and save your entry and that’s it.
 
-```javascript
+Well…that made me think that what makes Sonderly different from all these journals?
+
+Sonderly is built as a **retrieval-augmented thinking tool**. These are the features designed and built *on top of* the baseline(which was just the basic codelab):
+
+### 🔍 Semantic Search
+
+Search your entries by **meaning, not keywords**.
+
+ Every entry is embedded into a vector at save time (`gemini-embedding-2-preview`), and queries are matched by **cosine similarity**  so searching *"anxiety"* surfaces an entry that says *"my chest was tight before the meeting"* even though it never uses the word. 
+
+This is by far my most favorite one if you ask me and I have previously used the same knowledge for my project and I can’t lie I enjoyed it even more here!
+
+### 💬 Ask Your Past Self (RAG)
+
+Ask questions about your own journaling history!
+
+*"What have I written about my friendships?"*  and get an answer **grounded in your real past entries**, with the **source entries cited**.
+
+ It's a full retrieval-augmented generation pipeline over personal data, with an **honesty guardrail**: if you've never written about a topic, it says so rather than fabricating a past that doesn't exist. That is the most interesting part about RAG that if there is no answer, you will NOT be lied to with hallucinations.
+
+### 🧵 Entry Threading
+
+When viewing an entry, Sonderly automatically surfaces **related past reflections** via embedding similarity, with a relevance threshold so only genuine connections appear.
+
+What sets it apart from the other common features is that your journal becomes a connected web of thought overtime, not isolated notes that don’t make sense at all.
+
+### 📚 Contextual Book Recommendations (Google Books API)
+
+Being a book nerd myself, this feature was built purely by heart because sometimes when I have some strong emotions, I want to understand them but I get confused with this abundance of knowledge available, so this feature is a good one!
+
+Gemini reads the emotional tone and theme of an entry and recommends real books that might help , which are fetched live from **Google Books API** with real cover art, displayed as a tap-to-cycle deck. A secure third-party API integration with graceful fallbacks.
+
+### 🧭 Three Ways to Think
+
+A guided entry point lets users choose how they want to engage:
+
+- **Reflect & Synthesize** : write freely and receive an AI synthesis with emotional themes and book recommendations.
+- **Talk it Through** : a real multi-turn conversation to untangle a problem or work through a decision.
+- **Ask Your Past Self** : query your own journaling history and get answers grounded in your real past entries (see below).
+
+---
+
+## 🏗️ Architecture
+
+Sonderly runs as a **single containerized service on Cloud Run** it is an Express/Node backend that both serves the React frontend and handles all AI and data operations server-side.
+
+```
+Browser (React) ──sign in──▶ Firebase Auth (ID token)
+      │
+      │  authenticated requests (ID token)
+      ▼
+Express backend (Cloud Run)
+      ├─ verifies the Firebase ID token
+      ├─ retrieves API keys server-side (never exposed to the browser)
+      ├─ calls Gemini (chat, synthesis, embeddings)
+      ├─ calls Google Books API
+      └─ reads/writes Cloud Firestore, scoped to the verified user's UID
+```
+
+The core security principle: **the browser never holds a secret and never talks to a paid API directly.** All sensitive operations happen on the server, and all data access is bound to the authenticated user.
+
+---
+
+## 🔐 Security
+
+Security is the foundation of this challenge, and Sonderly treats it as a first-class concern rather than an afterthought.
+
+### User Authentication
+
+- **Firebase Authentication** (Google Sign-In) : no password handling, server-side ID-token verification on every protected request.
+
+### Per-User Data Isolation (Zero Cross-User Leakage)
+
+Every user's data lives under their own UID path (`/users/{userId}/...`), and access is enforced **at the database layer** by Firestore Security Rules — not just in application code. Even if the frontend were fully compromised, the database itself rejects any cross-user access.
+
+```jsx
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
+    // User-isolated interactions and journal entries
     match /users/{userId}/interactions/{interactionId} {
       allow read, write: if request.auth != null && request.auth.uid == userId;
     }
@@ -52,74 +114,92 @@ service cloud.firestore {
 }
 ```
 
+This isolation extends to the AI features too: semantic search, RAG, and entry threading only ever query the authenticated user's own documents — cross-user retrieval is impossible by construction.
+
+### Secure Key Management
+
+- **No hardcoded secrets.** API keys are retrieved **server-side only** and never shipped to the browser.
+- In production, keys are designed to be retrieved via **Google Cloud Secret Manager**; a secure server-side environment variable is used as the development fallback.
+- The Gemini and Google Books keys are used exclusively on the Express backend.
+
+### Threat Modeling & Secure Coding
+
+Development was governed by custom security directives (an evolving "constitution" in Google AI Studio) covering:
+
+- **Agentic threat modeling** across input surfaces, tool execution, and memory/state.
+- **OWASP Web & LLM Top 10** : input validation, prompt-injection safety (retrieved entry content is treated as data, never instructions), and safe output handling.
+- **Zero insecure defaults** in Firestore rules, and undefined-stripping before writes for data integrity.
+
 ---
 
-## 🔑 Google Cloud Secret Manager Setup
+## 🛠️ Tech Stack
 
-Store your Gemini API key and Google Books API key in Secret Manager and grant access to your Cloud Run service account:
+| Layer | Technology |
+| --- | --- |
+| Frontend | React, TypeScript |
+| Backend | Node.js / Express (single Cloud Run service) |
+| AI — generation | Gemini API (`gemini-3.6-flash`) |
+| AI — embeddings | Gemini embeddings (`gemini-embedding-2-preview`) with a resilient fallback ladder |
+| Authentication | Firebase Authentication (Google Sign-In) |
+| Database | Cloud Firestore (user-isolated) |
+| External API | Google Books API |
+| Secrets | Google Cloud Secret Manager (prod) / server-side env var (dev) |
+| Deployment | Google Cloud Run (containerized) |
 
-```bash
-# 1. Create and populate the secrets
-gcloud secrets create GEMINI_API_KEY --replication-policy="automatic"
-echo -n "YOUR_GEMINI_API_KEY" | gcloud secrets versions add GEMINI_API_KEY --data-file=-
+---
 
-gcloud secrets create GOOGLE_BOOKS_API_KEY --replication-policy="automatic"
-echo -n "YOUR_GOOGLE_BOOKS_API_KEY" | gcloud secrets versions add GOOGLE_BOOKS_API_KEY --data-file=-
+## 🚀 Setup & Deployment
 
-# 2. Grant the default Cloud Run service account access to read the secrets
-gcloud secrets add-iam-policy-binding GEMINI_API_KEY \
-  --member="serviceAccount:YOUR_PROJECT_NUMBER-compute@developer.gserviceaccount.com" \
-  --role="roles/secretmanager.secretAccessor"
+### Prerequisites
 
-gcloud secrets add-iam-policy-binding GOOGLE_BOOKS_API_KEY \
-  --member="serviceAccount:YOUR_PROJECT_NUMBER-compute@developer.gserviceaccount.com" \
-  --role="roles/secretmanager.secretAccessor"
+- A Google Cloud project with billing enabled
+- Firebase project (Authentication + Firestore enabled)
+- `gcloud` CLI (or Google Cloud Shell)
+
+### Environment Variables
+
+The backend expects the following (set as environment variables locally / Secret Manager in production — never hardcoded):
+
+| Variable | Purpose |
+| --- | --- |
+| `GEMINI_API_KEY` | Gemini API access (chat, synthesis, embeddings) |
+| `GOOGLE_BOOKS_API_KEY` | Google Books API (book cover lookups) |
+| Firebase config | Firebase Auth / Firestore project configuration |
+
+### Firestore Security Rules
+
+Deploy the rules in `firestore.rules` (shown above) to enforce per-user data isolation.
+
+### Deploy to Cloud Run
+
+The app is deployed from Google AI Studio's publish flow (or via `gcloud run deploy`), which builds the container and provisions a public Cloud Run service.
+
+The Cloud Run service is labeled for challenge verification:
+
+```
+dev-tutorial = cloud-run-ai-challenge
 ```
 
 ---
 
-## 🚀 Google Cloud Run Deployment
+## 🎯 Beyond the Baseline
 
-### 1. Build and Deploy Service
+The challenge baseline provides: Firebase Auth, multi-turn Gemini chat, user-isolated Firestore storage, and secure key management. **Sonderly extends the baseline** with the following original work:
 
-```bash
-# Enable required Google Cloud APIs
-gcloud services enable run.googleapis.com secretmanager.googleapis.com firestore.googleapis.com
-
-# Deploy the container to Google Cloud Run
-gcloud run deploy reflectai \
-  --source . \
-  --platform managed \
-  --region us-central1 \
-  --allow-unauthenticated \
-  --set-secrets GEMINI_API_KEY=GEMINI_API_KEY:latest,GOOGLE_BOOKS_API_KEY=GOOGLE_BOOKS_API_KEY:latest
-```
-
-### 2. Mandatory Verification Labeling
-
-Apply the challenge verification label to register the service:
-
-```bash
-gcloud run services update reflectai \
-  --update-labels=dev-tutorial=cloud-run-ai-challenge \
-  --region=us-central1
-```
+- **Semantic search** over entries using Gemini embeddings + cosine similarity.
+- **Ask Your Past Self** : retrieval-augmented Q&A over the user's own entries, with source attribution and an anti-hallucination honesty guardrail.
+- **Entry threading** : automatic surfacing of semantically related past reflections, with a relevance threshold.
+- **Google Books API integration** : real, secured third-party API for context-aware book recommendations with live cover art.
+- **A three-mode UX** (Reflect & Synthesize / Talk it Through / Ask Your Past Self) with a guided choice screen.
+- **A complete custom design system** and product identity.
+- **Expanded security directives** in Google AI Studio covering each new feature (embeddings, RAG, third-party API), including OWASP-aligned threat modeling.
 
 ---
 
-## 🧪 Functional Verification Test Walkthrough
+## 📄 License
 
-| Test ID | Process | Steps | Expected Result |
-| :--- | :--- | :--- | :--- |
-| **TC-01** | **Google Sign-In** | Click "Sign In with Google", select account. | Profile synced, user enters private workspace. |
-| **TC-02** | **Journal Writing** | Add title, insert prompt template, write reflection. | Reactive character and word counters update. |
-| **TC-03** | **Firestore Persistence** | Click "Save to Firestore". | Stored under `/users/{userId}/entries/{entryId}`. |
-| **TC-04** | **Gemini Dialogue** | Select mode, ask question, click Send. | Gemini streams empathetic response with Markdown. |
-| **TC-05** | **AI Synthesis** | Click "AI Summary". | Sentiment, key insight, and thematic tags rendered. |
-| **TC-06** | **Search & Deletion** | Filter entries by tag/keyword, delete entry. | Firestore real-time listener updates view. |
-| **TC-07** | **Vector Embedding** | Write reflection, click "Save to Firestore". | Server generates Gemini text embedding stored in Firestore `embedding` field. |
-| **TC-08** | **Semantic Search** | Type conceptual query in Past Entries, click "Semantic Search". | Server generates query embedding; user entries ranked by cosine similarity with match percentage. |
-| **TC-09** | **Ask Your Past Self (RAG)** | Click "Ask Past Self" tab, ask question about journal history, click "Ask". | Server generates query embedding, retrieves top matching entries via cosine similarity, and Gemini synthesizes a grounded answer referencing real reflections. |
-| **TC-10** | **Recommended Reads (Google Books)** | Click "AI Summary", observe recommended books and tap stacked card deck. | Server resolves real cover images via Google Books API with cycling animation and graceful placeholder fallback. |
-| **TC-11** | **Entry Threading & Related Reflections** | Open saved journal entry in editor, inspect "Related Reflections" section, click a connected card. | Cosine similarity finds 2-3 most relevant past entries (>=65% match) from the user's private collection; clicking opens the connected entry, and unmeaningful matches are suppressed. |
+[Choose a license — e.g. MIT — see note below]
 
+---
+
+*Built with Google AI Studio, Gemini, Firebase, and Cloud Run.*
