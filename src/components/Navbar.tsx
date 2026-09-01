@@ -81,7 +81,7 @@ export const Navbar: React.FC<NavbarProps> = ({
           </div>
         </div>
 
-        {/* Center Main Navigation: Decluttered to Home, Past Entries, Ask Past Self */}
+        {/* Center Main Navigation: Home & Past Entries */}
         {user && (
           <nav className="flex items-center bg-[#F2ECE4] p-1 rounded-xl border border-[#E2DBD0] gap-1">
             {/* Home Tab */}
@@ -115,20 +115,6 @@ export const Navbar: React.FC<NavbarProps> = ({
                   {entriesCount}
                 </span>
               )}
-            </button>
-
-            {/* Ask Past Self */}
-            <button
-              id="nav-tab-ask"
-              onClick={() => setActiveTab('ask')}
-              className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg text-xs sm:text-sm font-bold transition-all cursor-pointer ${
-                activeTab === 'ask'
-                  ? 'bg-[#FFFFFF] text-[#1F1D1A] shadow-xs border border-[#E0D9CE]'
-                  : 'text-[#3D352E] hover:text-[#000000] hover:bg-[#EAE2D8]'
-              }`}
-            >
-              <Sparkles className="w-4 h-4 text-[#8C5E24]" />
-              <span>Ask Past Self</span>
             </button>
           </nav>
         )}

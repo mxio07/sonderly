@@ -41,7 +41,7 @@ export const ModeChoiceHome: React.FC<ModeChoiceHomeProps> = ({
       <ElegantFlowingRibbons animated={true} />
 
       {/* Central Content Container */}
-      <div className="relative z-10 max-w-5xl mx-auto w-full flex-1 flex flex-col justify-center">
+      <div className="relative z-10 max-w-6xl mx-auto w-full flex-1 flex flex-col justify-center">
         
         {/* Welcoming Top Header */}
         <div className="text-center max-w-3xl mx-auto mb-10 sm:mb-14">
@@ -62,35 +62,35 @@ export const ModeChoiceHome: React.FC<ModeChoiceHomeProps> = ({
           </h1>
 
           <p className="text-base sm:text-lg text-[#3D352E] mt-3.5 font-normal leading-relaxed">
-            Select a mode to begin. You can switch between deep reflection and interactive dialogue at any time.
+            Select a mode to begin. You can switch between deep reflection, interactive dialogue, and historical inquiry at any time.
           </p>
         </div>
 
-        {/* The Two Choice Cards Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8 max-w-4xl mx-auto w-full mb-12">
+        {/* The Three Choice Cards Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-7 max-w-6xl mx-auto w-full mb-12">
           
           {/* Choice Card 1: Reflect & Synthesize */}
           <div
             id="card-mode-write"
             onClick={() => onSelectMode('write')}
-            className="group relative rounded-2xl bg-gradient-to-b from-[#FFFFFF]/95 to-[#FAF8F5]/95 backdrop-blur-xs border-2 border-[#E0D8CA] hover:border-[#8C5E24] p-7 sm:p-8 text-left shadow-xs hover:shadow-md transition-all duration-300 flex flex-col justify-between cursor-pointer transform hover:-translate-y-1"
+            className="group relative rounded-2xl bg-gradient-to-b from-[#FFFFFF]/95 to-[#FAF8F5]/95 backdrop-blur-xs border-2 border-[#E0D8CA] hover:border-[#8C5E24] p-7 sm:p-8 text-left shadow-xs hover:shadow-md transition-all duration-300 flex flex-col justify-between cursor-pointer transform hover:-translate-y-1 overflow-hidden"
           >
-            {/* Ambient Corner Accent */}
-            <div className="absolute top-0 right-0 w-28 h-28 bg-[#F5EFE6]/60 rounded-bl-full pointer-events-none group-hover:bg-[#F5ECD9] transition-colors" />
+            {/* Ambient Corner Accent (Lower z-index behind text) */}
+            <div className="absolute top-0 right-0 w-28 h-28 bg-[#F5EFE6]/60 rounded-bl-full pointer-events-none group-hover:bg-[#F5ECD9] transition-colors z-0" />
 
-            <div>
+            <div className="relative z-10">
               {/* Header Badge & Icon */}
               <div className="flex items-center justify-between mb-6">
                 <div className="w-12 h-12 rounded-xl bg-gradient-to-b from-[#2A241F] to-[#1F1D1A] text-white flex items-center justify-center border border-[#423A31] shadow-xs group-hover:scale-105 transition-transform">
                   <PenTool className="w-6 h-6 text-[#E5C287]" />
                 </div>
-                <span className="px-3 py-1 rounded-full bg-[#F5EFE6] border border-[#DFCBA8] text-[#6B4716] text-xs font-mono font-semibold">
+                <span className="px-3.5 py-1 rounded-full bg-[#FAF8F5] border border-[#DFCBA8] text-[#593A12] text-xs sm:text-sm font-mono font-bold shadow-2xs">
                   Mode 01
                 </span>
               </div>
 
               {/* Title */}
-              <h2 className="text-2xl font-serif font-bold text-[#1F1D1A] group-hover:text-[#8C5E24] transition-colors tracking-tight mb-3">
+              <h2 className="text-2xl sm:text-3xl font-serif font-bold text-[#1F1D1A] group-hover:text-[#8C5E24] transition-colors tracking-tight mb-3">
                 Reflect &amp; Synthesize
               </h2>
 
@@ -121,7 +121,7 @@ export const ModeChoiceHome: React.FC<ModeChoiceHomeProps> = ({
             </div>
 
             {/* Action CTA Button */}
-            <div className="flex items-center justify-between pt-4 border-t border-[#EAE4DC] text-sm sm:text-base font-bold text-[#1F1D1A] group-hover:text-[#8C5E24] transition-colors">
+            <div className="relative z-10 flex items-center justify-between pt-4 border-t border-[#EAE4DC] text-sm sm:text-base font-bold text-[#1F1D1A] group-hover:text-[#8C5E24] transition-colors">
               <span>Open Reflection Workspace</span>
               <div className="w-9 h-9 rounded-full bg-[#FAF8F5] group-hover:bg-[#8C5E24] text-[#1F1D1A] group-hover:text-white border border-[#E0D8CA] group-hover:border-[#8C5E24] flex items-center justify-center transition-all">
                 <ArrowRight className="w-4.5 h-4.5 group-hover:translate-x-0.5 transition-transform" />
@@ -133,18 +133,18 @@ export const ModeChoiceHome: React.FC<ModeChoiceHomeProps> = ({
           <div
             id="card-mode-dialogue"
             onClick={() => onSelectMode('dialogue')}
-            className="group relative rounded-2xl bg-gradient-to-b from-[#FFFFFF]/95 to-[#FAF8F5]/95 backdrop-blur-xs border-2 border-[#E0D8CA] hover:border-[#8C5E24] p-7 sm:p-8 text-left shadow-xs hover:shadow-md transition-all duration-300 flex flex-col justify-between cursor-pointer transform hover:-translate-y-1"
+            className="group relative rounded-2xl bg-gradient-to-b from-[#FFFFFF]/95 to-[#FAF8F5]/95 backdrop-blur-xs border-2 border-[#E0D8CA] hover:border-[#8C5E24] p-7 sm:p-8 text-left shadow-xs hover:shadow-md transition-all duration-300 flex flex-col justify-between cursor-pointer transform hover:-translate-y-1 overflow-hidden"
           >
-            {/* Ambient Corner Accent */}
-            <div className="absolute top-0 right-0 w-28 h-28 bg-[#F5ECD9]/60 rounded-bl-full pointer-events-none group-hover:bg-[#F5EFE6] transition-colors" />
+            {/* Ambient Corner Accent (Lower z-index behind text) */}
+            <div className="absolute top-0 right-0 w-28 h-28 bg-[#F5ECD9]/60 rounded-bl-full pointer-events-none group-hover:bg-[#F5EFE6] transition-colors z-0" />
 
-            <div>
+            <div className="relative z-10">
               {/* Header Badge & Icon */}
               <div className="flex items-center justify-between mb-6">
                 <div className="w-12 h-12 rounded-xl bg-gradient-to-b from-[#7A4F1D] to-[#593A12] text-white flex items-center justify-center border border-[#8C5E24] shadow-xs group-hover:scale-105 transition-transform">
                   <MessageSquare className="w-6 h-6 text-[#FAF8F5]" />
                 </div>
-                <span className="px-3.5 py-1 rounded-full bg-[#FAF8F5] border border-[#DFCBA8] text-[#593A12] text-xs sm:text-sm font-mono font-bold">
+                <span className="px-3.5 py-1 rounded-full bg-[#FAF8F5] border border-[#DFCBA8] text-[#593A12] text-xs sm:text-sm font-mono font-bold shadow-2xs">
                   Mode 02
                 </span>
               </div>
@@ -181,8 +181,68 @@ export const ModeChoiceHome: React.FC<ModeChoiceHomeProps> = ({
             </div>
 
             {/* Action CTA Button */}
-            <div className="flex items-center justify-between pt-4 border-t border-[#EAE4DC] text-sm sm:text-base font-bold text-[#1F1D1A] group-hover:text-[#8C5E24] transition-colors">
+            <div className="relative z-10 flex items-center justify-between pt-4 border-t border-[#EAE4DC] text-sm sm:text-base font-bold text-[#1F1D1A] group-hover:text-[#8C5E24] transition-colors">
               <span>Begin Socratic Conversation</span>
+              <div className="w-9 h-9 rounded-full bg-[#FAF8F5] group-hover:bg-[#8C5E24] text-[#1F1D1A] group-hover:text-white border border-[#E0D8CA] group-hover:border-[#8C5E24] flex items-center justify-center transition-all">
+                <ArrowRight className="w-4.5 h-4.5 group-hover:translate-x-0.5 transition-transform" />
+              </div>
+            </div>
+          </div>
+
+          {/* Choice Card 3: Ask Your Past Self */}
+          <div
+            id="card-mode-ask"
+            onClick={onNavigateToAsk}
+            className="group relative rounded-2xl bg-gradient-to-b from-[#FFFFFF]/95 to-[#FAF8F5]/95 backdrop-blur-xs border-2 border-[#E0D8CA] hover:border-[#8C5E24] p-7 sm:p-8 text-left shadow-xs hover:shadow-md transition-all duration-300 flex flex-col justify-between cursor-pointer transform hover:-translate-y-1 overflow-hidden"
+          >
+            {/* Ambient Corner Accent (Lower z-index behind text) */}
+            <div className="absolute top-0 right-0 w-28 h-28 bg-[#F5EFE6]/60 rounded-bl-full pointer-events-none group-hover:bg-[#F5ECD9] transition-colors z-0" />
+
+            <div className="relative z-10">
+              {/* Header Badge & Icon */}
+              <div className="flex items-center justify-between mb-6">
+                <div className="w-12 h-12 rounded-xl bg-gradient-to-b from-[#3D3126] to-[#241E18] text-white flex items-center justify-center border border-[#423A31] shadow-xs group-hover:scale-105 transition-transform">
+                  <Search className="w-6 h-6 text-[#E5C287]" />
+                </div>
+                <span className="px-3.5 py-1 rounded-full bg-[#FAF8F5] border border-[#DFCBA8] text-[#593A12] text-xs sm:text-sm font-mono font-bold shadow-2xs">
+                  Mode 03
+                </span>
+              </div>
+
+              {/* Title */}
+              <h2 className="text-2xl sm:text-3xl font-serif font-bold text-[#1F1D1A] group-hover:text-[#8C5E24] transition-colors tracking-tight mb-3">
+                Ask Your Past Self
+              </h2>
+
+              {/* Explicit Requested Description */}
+              <p className="text-sm sm:text-base text-[#3D352E] leading-relaxed font-normal mb-6">
+                Ask questions about your own journaling history and get answers grounded in your real past entries — with the sources shown.
+              </p>
+
+              {/* Included Capabilities List */}
+              <div className="space-y-2.5 mb-8 pt-4 border-t border-[#EAE4DC]">
+                <div className="flex items-center gap-2 text-xs sm:text-sm text-[#24201C] font-semibold">
+                  <CheckCircle2 className="w-4 h-4 text-[#8C5E24] shrink-0" />
+                  <span>Retrieval-augmented answers from your entries</span>
+                </div>
+                <div className="flex items-center gap-2 text-xs sm:text-sm text-[#24201C] font-semibold">
+                  <CheckCircle2 className="w-4 h-4 text-[#8C5E24] shrink-0" />
+                  <span>Sources cited from your real reflections</span>
+                </div>
+                <div className="flex items-center gap-2 text-xs sm:text-sm text-[#24201C] font-semibold">
+                  <CheckCircle2 className="w-4 h-4 text-[#8C5E24] shrink-0" />
+                  <span>Honest when a topic hasn't come up</span>
+                </div>
+                <div className="flex items-center gap-2 text-xs sm:text-sm text-[#24201C] font-semibold">
+                  <CheckCircle2 className="w-4 h-4 text-[#8C5E24] shrink-0" />
+                  <span>Semantic search across your history</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Action CTA Button */}
+            <div className="relative z-10 flex items-center justify-between pt-4 border-t border-[#EAE4DC] text-sm sm:text-base font-bold text-[#1F1D1A] group-hover:text-[#8C5E24] transition-colors">
+              <span>Explore Your History</span>
               <div className="w-9 h-9 rounded-full bg-[#FAF8F5] group-hover:bg-[#8C5E24] text-[#1F1D1A] group-hover:text-white border border-[#E0D8CA] group-hover:border-[#8C5E24] flex items-center justify-center transition-all">
                 <ArrowRight className="w-4.5 h-4.5 group-hover:translate-x-0.5 transition-transform" />
               </div>
