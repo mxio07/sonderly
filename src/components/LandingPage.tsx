@@ -26,13 +26,13 @@ export const LandingPage: React.FC<LandingPageProps> = ({
       <div className="relative z-10 max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 pt-16 pb-12 sm:pt-24 sm:pb-16 text-center flex-1 flex flex-col justify-center">
         
         {/* Security & Intelligence Badge */}
-        <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#FFFFFF]/95 backdrop-blur-xs border border-[#E0D8CA] text-[#6B4716] text-xs font-semibold mb-8 shadow-xs mx-auto">
-          <Sparkles className="w-3.5 h-3.5 text-[#8C5E24]" />
+        <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#FFFFFF]/95 backdrop-blur-xs border border-[#DFCBA8] text-[#593A12] text-xs sm:text-sm font-bold mb-8 shadow-xs mx-auto">
+          <Sparkles className="w-4 h-4 text-[#8C5E24]" />
           <span>Intelligent Thinking Companion &bull; Powered by Gemini</span>
-          <span className="text-[#A89884]">•</span>
+          <span className="text-[#8C5E24]">•</span>
           <button 
             onClick={onOpenThreatModel} 
-            className="text-[#4D453B] hover:text-[#1F1D1A] underline underline-offset-2 font-medium cursor-pointer transition-colors"
+            className="text-[#1F1D1A] hover:text-[#8C5E24] underline underline-offset-2 font-bold cursor-pointer transition-colors"
           >
             Security Specs
           </button>
@@ -47,15 +47,15 @@ export const LandingPage: React.FC<LandingPageProps> = ({
         </h1>
 
         {/* Subtitle / Value proposition */}
-        <p className="max-w-2xl mx-auto text-base sm:text-lg lg:text-xl text-[#3D352E] mb-10 leading-relaxed font-normal">
+        <p className="max-w-2xl mx-auto text-base sm:text-lg lg:text-xl text-[#24201C] mb-10 leading-relaxed font-normal">
           A private, structured thinking environment where deep inquiry meets cognitive synthesis. Transform scattered insights into coherent understanding with grounded memory.
         </p>
 
         {/* Error notification if sign in fails */}
         {errorMessage && (
-          <div className="max-w-md mx-auto mb-6 p-4 rounded-xl bg-[#FDF3F0] border border-[#FADCD5] text-[#9E4733] text-sm text-left shadow-xs">
-            <p className="font-semibold mb-1">Authentication Notice</p>
-            <p className="text-xs text-[#9E4733]">{errorMessage}</p>
+          <div className="max-w-md mx-auto mb-6 p-4 rounded-xl bg-[#FDF3F0] border border-[#FADCD5] text-[#9E4733] text-sm sm:text-base text-left shadow-xs">
+            <p className="font-bold mb-1">Authentication Notice</p>
+            <p className="text-xs sm:text-sm text-[#9E4733]">{errorMessage}</p>
           </div>
         )}
 
@@ -70,7 +70,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
               id="btn-google-signin"
               onClick={onSignIn}
               disabled={isLoading}
-              className="relative w-full sm:w-auto flex items-center justify-center gap-3 px-9 py-4 rounded-xl font-semibold bg-[#2A241F] hover:bg-[#1F1B17] text-white shadow-sm hover:shadow-md transition-all duration-300 transform active:scale-98 disabled:opacity-50 disabled:cursor-not-allowed text-base cursor-pointer border border-[#423A31]"
+              className="relative w-full sm:w-auto flex items-center justify-center gap-3 px-9 py-4 rounded-xl font-bold bg-[#2A241F] hover:bg-[#1F1B17] text-white shadow-sm hover:shadow-md transition-all duration-300 transform active:scale-98 disabled:opacity-50 disabled:cursor-not-allowed text-base sm:text-lg cursor-pointer border border-[#423A31]"
             >
               {isLoading ? (
                 <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
@@ -94,8 +94,8 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                   />
                 </svg>
               )}
-              <span className="tracking-wide text-base">Sign In with Google</span>
-              <ArrowRight className="w-4 h-4 text-[#E5C287] group-hover:translate-x-0.5 transition-transform" />
+              <span className="tracking-wide">Sign In with Google</span>
+              <ArrowRight className="w-5 h-5 text-[#E5C287] group-hover:translate-x-0.5 transition-transform" />
             </button>
           </div>
         </div>
@@ -106,7 +106,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
       </div>
 
       {/* Footer */}
-      <footer className="relative z-10 border-t border-[#EAE4DC] py-6 text-center text-xs text-[#4D453B] bg-[#FFFFFF]/90 backdrop-blur-xs font-medium">
+      <footer className="relative z-10 border-t border-[#EAE4DC] py-6 text-center text-xs sm:text-sm text-[#3D352E] bg-[#FFFFFF]/90 backdrop-blur-xs font-semibold">
         <div className="max-w-5xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-2">
           <span>Intelligent companion for personal clarity &amp; structured thought</span>
           <span>Sonderly &copy; {new Date().getFullYear()}</span>

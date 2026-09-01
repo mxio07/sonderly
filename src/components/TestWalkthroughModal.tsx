@@ -202,34 +202,34 @@ export const TestWalkthroughModal: React.FC<TestWalkthroughModalProps> = ({ isOp
         {/* Header */}
         <div className="p-5 border-b border-[#EAE4DC] flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-[#F5EFE6] text-[#8C6226] flex items-center justify-center border border-[#E8DCB8] shadow-xs">
-              <Play className="w-5 h-5 text-[#B88746]" />
+            <div className="w-10 h-10 rounded-xl bg-[#F5EFE6] text-[#593A12] flex items-center justify-center border border-[#DFCBA8] shadow-xs">
+              <Play className="w-5 h-5 text-[#8C5E24]" />
             </div>
             <div>
-              <h2 className="text-lg font-serif font-bold text-[#1F1D1A]">Functional Test Walkthroughs</h2>
-              <p className="text-xs text-[#7C7469]">Step-by-step test verification for all user flows and processes</p>
+              <h2 className="text-lg sm:text-xl font-serif font-bold text-[#1F1D1A]">Functional Test Walkthroughs</h2>
+              <p className="text-xs sm:text-sm text-[#3D352E] font-semibold">Step-by-step test verification for all user flows and processes</p>
             </div>
           </div>
           <button
             id="btn-test-walkthrough-close"
             onClick={onClose}
-            className="p-2 text-[#9E9589] hover:text-[#1F1D1A] hover:bg-[#FAF8F5] rounded-xl transition-colors cursor-pointer"
+            className="p-2 text-[#593A12] hover:text-[#1F1D1A] hover:bg-[#FAF8F5] rounded-xl transition-colors cursor-pointer"
           >
             <X className="w-5 h-5" />
           </button>
         </div>
 
         {/* Status Bar */}
-        <div className="px-6 py-3 bg-[#FAF8F5] border-b border-[#E8E2D7] flex items-center justify-between text-xs text-[#7C7469]">
-          <span className="font-medium">Verification Progress: {totalCompleted} of {TEST_CASES.length} scenarios verified</span>
+        <div className="px-6 py-3 bg-[#FAF8F5] border-b border-[#E0D8CA] flex items-center justify-between text-xs sm:text-sm text-[#24201C]">
+          <span className="font-bold">Verification Progress: {totalCompleted} of {TEST_CASES.length} scenarios verified</span>
           <div className="flex items-center gap-2">
-            <div className="w-32 h-2 rounded-full bg-[#EAE4DC] overflow-hidden">
+            <div className="w-32 h-2.5 rounded-full bg-[#EAE4DC] overflow-hidden">
               <div
-                className="h-full bg-[#B88746] transition-all rounded-full"
+                className="h-full bg-[#8C5E24] transition-all rounded-full"
                 style={{ width: `${(totalCompleted / TEST_CASES.length) * 100}%` }}
               />
             </div>
-            <span className="font-bold text-[#8C6226]">
+            <span className="font-mono font-bold text-[#593A12]">
               {Math.round((totalCompleted / TEST_CASES.length) * 100)}%
             </span>
           </div>
@@ -245,49 +245,49 @@ export const TestWalkthroughModal: React.FC<TestWalkthroughModalProps> = ({ isOp
                 key={tc.id}
                 className={`p-4 rounded-xl border transition-all ${
                   isDone
-                    ? 'bg-[#F8F5F0] border-[#E8DCB8] text-[#1F1D1A]'
-                    : 'bg-[#FFFFFF] border-[#E8E2D7] text-[#423A31] shadow-xs'
+                    ? 'bg-[#F8F5F0] border-[#DFCBA8] text-[#1F1D1A]'
+                    : 'bg-[#FFFFFF] border-[#E0D8CA] text-[#24201C] shadow-xs'
                 }`}
               >
                 <div className="flex items-start justify-between gap-3 mb-2">
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-2.5">
                     <button
                       onClick={() => toggleTest(tc.id)}
-                      className={`p-1 rounded-lg border transition-all cursor-pointer ${
+                      className={`p-1.5 rounded-lg border transition-all cursor-pointer ${
                         isDone
-                          ? 'bg-[#B88746] text-white border-[#B88746]'
-                          : 'bg-[#FAF8F5] text-[#9E9589] border-[#E8E2D7] hover:text-[#1F1D1A]'
+                          ? 'bg-[#8C5E24] text-white border-[#8C5E24]'
+                          : 'bg-[#FAF8F5] text-[#7C7469] border-[#DFCBA8] hover:text-[#1F1D1A]'
                       }`}
                     >
                       <CheckCircle2 className="w-4 h-4" />
                     </button>
                     <div>
-                      <span className="text-[10px] font-mono uppercase px-2 py-0.5 rounded bg-[#F5EFE6] text-[#8C6226] font-bold mr-2 border border-[#E8DCB8]">
+                      <span className="text-xs font-mono uppercase px-2 py-0.5 rounded bg-[#F5EFE6] text-[#593A12] font-bold mr-2 border border-[#DFCBA8]">
                         {tc.id}
                       </span>
-                      <span className="font-bold text-[#1F1D1A]">{tc.name}</span>
+                      <span className="font-bold text-[#1F1D1A] text-sm sm:text-base">{tc.name}</span>
                     </div>
                   </div>
-                  <span className="text-[11px] px-2.5 py-0.5 rounded-full bg-[#FAF8F5] text-[#7C7469] font-semibold border border-[#E8E2D7]">
+                  <span className="text-xs px-2.5 py-0.5 rounded-full bg-[#FAF8F5] text-[#3D352E] font-bold border border-[#DFCBA8]">
                     {tc.category}
                   </span>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mt-3 text-xs">
-                  <div className="p-3 rounded-xl bg-[#FAF8F5] border border-[#E8E2D7]">
-                    <p className="font-semibold text-[#8C6226] mb-1.5">Execution Steps:</p>
-                    <ol className="list-decimal list-inside space-y-1 text-[#423A31] font-medium">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mt-3 text-xs sm:text-sm">
+                  <div className="p-3.5 rounded-xl bg-[#FAF8F5] border border-[#DFCBA8]">
+                    <p className="font-bold text-[#593A12] mb-1.5 text-xs sm:text-sm">Execution Steps:</p>
+                    <ol className="list-decimal list-inside space-y-1.5 text-[#24201C] font-medium">
                       {tc.steps.map((st, i) => (
                         <li key={i}>{st}</li>
                       ))}
                     </ol>
                   </div>
-                  <div className="p-3 rounded-xl bg-[#FAF8F5] border border-[#E8E2D7] flex flex-col justify-between">
+                  <div className="p-3.5 rounded-xl bg-[#FAF8F5] border border-[#DFCBA8] flex flex-col justify-between">
                     <div>
-                      <p className="font-semibold text-[#B88746] mb-1.5">Expected Outcome:</p>
-                      <p className="text-[#423A31] leading-relaxed font-medium">{tc.expectedResult}</p>
+                      <p className="font-bold text-[#593A12] mb-1.5 text-xs sm:text-sm">Expected Outcome:</p>
+                      <p className="text-[#24201C] leading-relaxed font-medium">{tc.expectedResult}</p>
                     </div>
-                    <p className="text-[10px] text-[#9E9589] mt-2 font-normal">Precondition: {tc.precondition}</p>
+                    <p className="text-xs text-[#5C5346] mt-2 font-medium">Precondition: {tc.precondition}</p>
                   </div>
                 </div>
               </div>
@@ -296,10 +296,10 @@ export const TestWalkthroughModal: React.FC<TestWalkthroughModalProps> = ({ isOp
         </div>
 
         {/* Footer */}
-        <div className="p-4 border-t border-[#EAE4DC] flex justify-end">
+        <div className="p-4.5 border-t border-[#EAE4DC] flex justify-end">
           <button
             onClick={onClose}
-            className="px-4 py-2 bg-[#B88746] hover:bg-[#A37438] text-white rounded-xl text-xs font-semibold transition-colors cursor-pointer shadow-xs"
+            className="px-5 py-2.5 bg-[#8C5E24] hover:bg-[#7A4F1D] text-white rounded-xl text-xs sm:text-sm font-bold transition-colors cursor-pointer shadow-xs"
           >
             Done Reviewing
           </button>

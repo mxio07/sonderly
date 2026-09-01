@@ -145,17 +145,17 @@ export const GeminiConversation: React.FC<GeminiConversationProps> = ({
               key={style.id}
               id={`btn-style-${style.id}`}
               onClick={() => setSelectedStyle(style.id)}
-              className={`flex items-center gap-2 p-2 rounded-xl text-left text-xs font-semibold border transition-all cursor-pointer ${
+              className={`flex items-center gap-2 p-2.5 rounded-xl text-left text-xs sm:text-sm font-bold border transition-all cursor-pointer ${
                 selectedStyle === style.id
-                  ? 'bg-[#F5EFE6] border-[#E8DCB8] text-[#8C6226] shadow-xs'
-                  : 'bg-[#F8F5F0] border-[#EAE4DC] text-[#7C7469] hover:text-[#1F1D1A] hover:bg-[#EDE8E1]'
+                  ? 'bg-[#F5EFE6] border-[#DFCBA8] text-[#593A12] shadow-xs'
+                  : 'bg-[#FAF8F5] border-[#E0D8CA] text-[#3D352E] hover:text-[#1F1D1A] hover:bg-[#F0EAE1]'
               }`}
             >
-              <div className={selectedStyle === style.id ? 'text-[#B88746]' : 'text-[#9E9589]'}>
+              <div className={selectedStyle === style.id ? 'text-[#8C5E24]' : 'text-[#6B6052]'}>
                 {style.icon}
               </div>
               <div className="truncate">
-                <p className="truncate">{style.label}</p>
+                <p className="truncate font-bold">{style.label}</p>
               </div>
             </button>
           ))}
@@ -163,27 +163,27 @@ export const GeminiConversation: React.FC<GeminiConversationProps> = ({
       </div>
 
       {/* Messages Scroll Area */}
-      <div className="flex-1 overflow-y-auto py-4 space-y-4 max-h-[420px] pr-1">
+      <div className="flex-1 overflow-y-auto py-4 space-y-4 max-h-[440px] pr-1">
         {messages.length === 0 ? (
-          <div className="h-full flex flex-col items-center justify-center text-center p-6 text-[#7C7469]">
-            <div className="w-12 h-12 rounded-2xl bg-[#F5EFE6] border border-[#E8DCB8] flex items-center justify-center text-[#B88746] mb-3 shadow-xs">
+          <div className="h-full flex flex-col items-center justify-center text-center p-6 text-[#4D453B]">
+            <div className="w-12 h-12 rounded-2xl bg-[#F5EFE6] border border-[#DFCBA8] flex items-center justify-center text-[#8C5E24] mb-3 shadow-xs">
               <Bot className="w-6 h-6" />
             </div>
-            <h4 className="text-sm font-bold text-[#1F1D1A] mb-1">Begin Your Exploration</h4>
-            <p className="text-xs text-[#7C7469] max-w-sm mb-4">
+            <h4 className="text-base font-bold text-[#1F1D1A] mb-1">Begin Your Exploration</h4>
+            <p className="text-xs sm:text-sm text-[#3D352E] max-w-sm mb-4 leading-relaxed font-normal">
               Ask Gemini to analyze your reflection above, examine tensions, or synthesize actionable insights.
             </p>
 
             {/* Suggested quick questions */}
-            <div className="w-full max-w-md flex flex-col gap-1.5 text-left">
-              <span className="text-[11px] uppercase tracking-wider text-[#9E9589] font-bold px-1">
+            <div className="w-full max-w-md flex flex-col gap-2 text-left">
+              <span className="text-xs uppercase tracking-wider text-[#3D352E] font-bold px-1">
                 Suggested Prompts:
               </span>
               {SUGGESTED_QUESTIONS.map((q, idx) => (
                 <button
                   key={idx}
                   onClick={() => handlePromptClick(q)}
-                  className="text-xs p-2.5 rounded-xl bg-[#FAF8F5] hover:bg-[#F5EFE6] border border-[#E8E2D7] text-[#423A31] hover:text-[#1F1D1A] hover:border-[#E8DCB8] transition-all text-left shadow-xs cursor-pointer font-medium"
+                  className="text-xs sm:text-sm p-3 rounded-xl bg-[#FAF8F5] hover:bg-[#F5EFE6] border border-[#E0D8CA] text-[#1F1D1A] hover:border-[#8C5E24] transition-all text-left shadow-2xs cursor-pointer font-medium leading-relaxed"
                 >
                   &ldquo;{q}&rdquo;
                 </button>
@@ -194,60 +194,60 @@ export const GeminiConversation: React.FC<GeminiConversationProps> = ({
           messages.map((msg) => (
             <div
               key={msg.id}
-              className={`flex gap-3 text-xs sm:text-sm ${
+              className={`flex gap-3 text-sm sm:text-base ${
                 msg.role === 'user' ? 'justify-end' : 'justify-start'
               }`}
             >
               {msg.role === 'model' && (
-                <div className="w-7 h-7 rounded-xl bg-[#F5EFE6] text-[#8C6226] flex items-center justify-center shrink-0 border border-[#E8DCB8] mt-0.5 shadow-xs">
-                  <Bot className="w-4 h-4 text-[#B88746]" />
+                <div className="w-8 h-8 rounded-xl bg-[#F5EFE6] text-[#593A12] flex items-center justify-center shrink-0 border border-[#DFCBA8] mt-0.5 shadow-xs">
+                  <Bot className="w-4.5 h-4.5 text-[#8C5E24]" />
                 </div>
               )}
 
               <div
-                className={`max-w-[85%] rounded-2xl p-3.5 shadow-xs ${
+                className={`max-w-[85%] rounded-2xl p-4 shadow-xs ${
                   msg.role === 'user'
                     ? 'bg-[#2A241F] text-white rounded-tr-xs'
-                    : 'bg-[#FAF8F5] border border-[#E8E2D7] text-[#1F1D1A] rounded-tl-xs'
+                    : 'bg-[#FAF8F5] border border-[#E0D8CA] text-[#1F1D1A] rounded-tl-xs'
                 }`}
               >
                 {msg.role === 'model' ? (
                   <div>
-                    <div className="flex items-center justify-between gap-2 pb-1.5 mb-1.5 border-b border-[#EAE4DC] text-[10px] text-[#7C7469] font-medium">
-                      <span className="capitalize font-semibold text-[#8C6226]">
+                    <div className="flex items-center justify-between gap-2 pb-2 mb-2 border-b border-[#EAE4DC] text-xs text-[#4D453B] font-semibold">
+                      <span className="capitalize font-bold text-[#593A12]">
                         {msg.style ? `${msg.style} Mode` : 'Reflection'}
                       </span>
                       <div className="flex items-center gap-2">
-                        {msg.modelUsed && <span>{msg.modelUsed}</span>}
+                        {msg.modelUsed && <span className="font-mono text-xs">{msg.modelUsed}</span>}
                         <button
                           onClick={() => handleCopy(msg.text, msg.id)}
-                          className="text-[#9E9589] hover:text-[#1F1D1A] p-0.5 cursor-pointer"
+                          className="text-[#6B6052] hover:text-[#1F1D1A] p-0.5 cursor-pointer"
                           title="Copy response"
                         >
                           {copiedId === msg.id ? (
-                            <Check className="w-3 h-3 text-[#B88746]" />
+                            <Check className="w-3.5 h-3.5 text-[#8C5E24]" />
                           ) : (
-                            <Copy className="w-3 h-3" />
+                            <Copy className="w-3.5 h-3.5" />
                           )}
                         </button>
                       </div>
                     </div>
-                    <div className="max-w-none text-xs sm:text-sm leading-relaxed space-y-2 text-[#1F1D1A]">
+                    <div className="max-w-none text-sm sm:text-base leading-relaxed space-y-2 text-[#1F1D1A] font-normal">
                       <Markdown>{msg.text}</Markdown>
                     </div>
                   </div>
                 ) : (
-                  <p className="whitespace-pre-wrap leading-relaxed">{msg.text}</p>
+                  <p className="whitespace-pre-wrap leading-relaxed font-normal">{msg.text}</p>
                 )}
 
-                <div className={`text-[10px] mt-1.5 ${msg.role === 'user' ? 'text-[#D8CEBE] text-right' : 'text-[#9E9589]'}`}>
+                <div className={`text-xs mt-2 font-medium ${msg.role === 'user' ? 'text-[#E0D8CA] text-right' : 'text-[#6B6052]'}`}>
                   {new Date(msg.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                 </div>
               </div>
 
               {msg.role === 'user' && (
-                <div className="w-7 h-7 rounded-xl bg-[#3D332A] text-[#E0B574] flex items-center justify-center shrink-0 shadow-xs mt-0.5 font-bold text-xs">
-                  <User className="w-4 h-4" />
+                <div className="w-8 h-8 rounded-xl bg-[#2A241F] text-[#E5C287] flex items-center justify-center shrink-0 shadow-xs mt-0.5 font-bold text-xs">
+                  <User className="w-4.5 h-4.5" />
                 </div>
               )}
             </div>
@@ -256,11 +256,11 @@ export const GeminiConversation: React.FC<GeminiConversationProps> = ({
 
         {isLoading && (
           <div className="flex gap-3 text-xs sm:text-sm justify-start">
-            <div className="w-7 h-7 rounded-xl bg-[#F5EFE6] text-[#8C6226] flex items-center justify-center shrink-0 border border-[#E8DCB8] mt-0.5 shadow-xs">
-              <Bot className="w-4 h-4 animate-pulse text-[#B88746]" />
+            <div className="w-8 h-8 rounded-xl bg-[#F5EFE6] text-[#593A12] flex items-center justify-center shrink-0 border border-[#DFCBA8] mt-0.5 shadow-xs">
+              <Bot className="w-4.5 h-4.5 animate-pulse text-[#8C5E24]" />
             </div>
-            <div className="bg-[#FAF8F5] border border-[#E8E2D7] text-[#7C7469] rounded-2xl rounded-tl-xs p-3.5 flex items-center gap-2 shadow-xs">
-              <RefreshCw className="w-3.5 h-3.5 animate-spin text-[#B88746]" />
+            <div className="bg-[#FAF8F5] border border-[#E0D8CA] text-[#3D352E] font-semibold rounded-2xl rounded-tl-xs p-3.5 flex items-center gap-2 shadow-xs">
+              <RefreshCw className="w-4 h-4 animate-spin text-[#8C5E24]" />
               <span>Gemini is synthesizing thoughts...</span>
             </div>
           </div>
@@ -271,7 +271,7 @@ export const GeminiConversation: React.FC<GeminiConversationProps> = ({
 
       {/* Error display */}
       {errorMessage && (
-        <div className="mb-3 p-2.5 bg-[#FDF3F0] border border-[#FADCD5] rounded-xl text-[#9E4733] text-xs shadow-xs">
+        <div className="mb-3 p-3 bg-[#FDF3F0] border border-[#FADCD5] rounded-xl text-[#9E4733] text-xs sm:text-sm shadow-xs font-medium">
           {errorMessage}
         </div>
       )}
@@ -286,18 +286,18 @@ export const GeminiConversation: React.FC<GeminiConversationProps> = ({
             onKeyDown={handleKeyDown}
             placeholder={`Ask Gemini in ${STYLE_OPTIONS.find(s => s.id === selectedStyle)?.label} mode... (Shift+Enter for newline)`}
             rows={2}
-            className="w-full bg-[#FAF8F5] border border-[#E8E2D7] rounded-xl p-3 pr-10 text-[#1F1D1A] placeholder-[#9E9589] text-xs sm:text-sm focus:outline-none focus:border-[#B88746] focus:ring-2 focus:ring-[#B88746]/20 transition-all resize-none"
+            className="w-full bg-[#FAF8F5] border border-[#E0D8CA] rounded-xl p-3 pr-12 text-[#1F1D1A] placeholder-[#6B6052] text-sm sm:text-base focus:outline-none focus:border-[#8C5E24] focus:ring-2 focus:ring-[#8C5E24]/20 transition-all resize-none font-normal"
           />
           <button
             id="btn-send-message"
             type="submit"
             disabled={!inputText.trim() || isLoading}
-            className="absolute right-2.5 bottom-3.5 p-1.5 rounded-lg bg-[#B88746] hover:bg-[#A37438] text-white disabled:opacity-30 disabled:cursor-not-allowed transition-all cursor-pointer shadow-xs"
+            className="absolute right-2.5 bottom-3.5 p-2 rounded-xl bg-[#8C5E24] hover:bg-[#734A18] text-white disabled:opacity-30 disabled:cursor-not-allowed transition-all cursor-pointer shadow-xs"
           >
             <Send className="w-4 h-4" />
           </button>
         </div>
-        <div className="flex items-center justify-between text-[11px] text-[#9E9589] px-1 font-medium">
+        <div className="flex items-center justify-between text-xs text-[#4D453B] px-1 font-semibold">
           <span>Active context: Journal Content ({entryContent.length} chars)</span>
           <span>Press Enter to send</span>
         </div>

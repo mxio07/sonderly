@@ -161,14 +161,14 @@ export const EntryHistory: React.FC<EntryHistoryProps> = ({
       {/* Top Controls */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-[#EAE4DC]">
         <div>
-          <h2 className="text-lg font-serif font-bold text-[#1F1D1A] flex items-center gap-2">
-            <BookOpen className="w-5 h-5 text-[#B88746]" />
+          <h2 className="text-xl sm:text-2xl font-serif font-bold text-[#1F1D1A] flex items-center gap-2.5">
+            <BookOpen className="w-5 h-5 text-[#8C5E24]" />
             <span>Past Reflections</span>
-            <span className="text-xs px-2.5 py-0.5 rounded-full bg-[#F5EFE6] text-[#8C6226] font-semibold border border-[#E8DCB8]">
+            <span className="text-xs sm:text-sm px-3 py-0.5 rounded-full bg-[#F5EFE6] text-[#593A12] font-bold border border-[#DFCBA8]">
               {entries.length} total
             </span>
           </h2>
-          <p className="text-xs text-[#7C7469] mt-0.5">Isolated &amp; stored securely in your private Cloud Firestore collection</p>
+          <p className="text-xs sm:text-sm text-[#4D453B] font-medium mt-1">Isolated &amp; stored securely in your private Cloud Firestore collection</p>
         </div>
 
         <div className="flex items-center gap-2 self-start sm:self-auto flex-wrap">
@@ -176,10 +176,10 @@ export const EntryHistory: React.FC<EntryHistoryProps> = ({
             <button
               id="btn-history-goto-ask"
               onClick={onNavigateToAsk}
-              className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-semibold bg-[#F5EFE6] hover:bg-[#EDE3D4] text-[#8C6226] border border-[#E8DCB8] transition-all shadow-xs cursor-pointer"
+              className="flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs sm:text-sm font-bold bg-[#F5EFE6] hover:bg-[#EDE3D4] text-[#593A12] border border-[#DFCBA8] transition-all shadow-xs cursor-pointer"
               title="Ask questions grounded in your past reflections"
             >
-              <Sparkles className="w-3.5 h-3.5 text-[#B88746]" />
+              <Sparkles className="w-4 h-4 text-[#8C5E24]" />
               <span>Ask Past Self</span>
             </button>
           )}
@@ -187,7 +187,7 @@ export const EntryHistory: React.FC<EntryHistoryProps> = ({
           <button
             id="btn-history-new-entry"
             onClick={onNewEntry}
-            className="flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-semibold bg-[#B88746] hover:bg-[#A37438] text-white transition-all shadow-xs cursor-pointer"
+            className="flex items-center gap-2 px-4.5 py-2 rounded-xl text-xs sm:text-sm font-bold bg-[#8C5E24] hover:bg-[#734A18] text-white transition-all shadow-xs cursor-pointer"
           >
             <Plus className="w-4 h-4" />
             <span>New Reflection</span>
@@ -199,23 +199,23 @@ export const EntryHistory: React.FC<EntryHistoryProps> = ({
       <div className="py-3.5 border-b border-[#EAE4DC] space-y-2.5">
         <form onSubmit={handleExecuteSemanticSearch} className="flex flex-col sm:flex-row gap-2">
           <div className="relative flex-1">
-            <Search className="w-4 h-4 absolute left-3 top-2.5 text-[#9E9589]" />
+            <Search className="w-4.5 h-4.5 absolute left-3.5 top-3 text-[#6B6052]" />
             <input
               id="input-history-search"
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Search semantically (e.g., 'feeling anxious about goals') or by keyword..."
-              className="w-full bg-[#FAF8F5] border border-[#E8E2D7] rounded-xl pl-9 pr-8 py-2 text-xs sm:text-sm text-[#1F1D1A] placeholder-[#9E9589] focus:outline-none focus:border-[#B88746] focus:ring-2 focus:ring-[#B88746]/20"
+              className="w-full bg-[#FAF8F5] border border-[#E0D8CA] rounded-xl pl-10 pr-9 py-2.5 text-sm sm:text-base text-[#1F1D1A] placeholder-[#6B6052] focus:outline-none focus:border-[#8C5E24] focus:ring-2 focus:ring-[#8C5E24]/20 font-normal"
             />
             {searchQuery && (
               <button
                 type="button"
                 id="btn-clear-search-input"
                 onClick={handleClearSemanticSearch}
-                className="absolute right-2.5 top-2.5 text-[#9E9589] hover:text-[#1F1D1A] cursor-pointer p-0.5"
+                className="absolute right-3 top-3 text-[#6B6052] hover:text-[#1F1D1A] cursor-pointer p-0.5"
               >
-                <X className="w-3.5 h-3.5" />
+                <X className="w-4 h-4" />
               </button>
             )}
           </div>
@@ -225,17 +225,17 @@ export const EntryHistory: React.FC<EntryHistoryProps> = ({
               id="btn-semantic-search"
               type="submit"
               disabled={isSemanticSearching || !searchQuery.trim()}
-              className="flex-1 sm:flex-none flex items-center justify-center gap-1.5 px-4 py-2 bg-[#2A241F] hover:bg-[#1F1B17] disabled:opacity-50 disabled:cursor-not-allowed text-white rounded-xl text-xs font-semibold transition-all shadow-xs cursor-pointer shrink-0"
+              className="flex-1 sm:flex-none flex items-center justify-center gap-1.5 px-4.5 py-2.5 bg-[#2A241F] hover:bg-[#1F1B17] disabled:opacity-50 disabled:cursor-not-allowed text-white rounded-xl text-xs sm:text-sm font-bold transition-all shadow-xs cursor-pointer shrink-0"
               title="Compare query vector embedding against stored entry embeddings with cosine similarity"
             >
               {isSemanticSearching ? (
                 <>
-                  <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                  <Loader2 className="w-4 h-4 animate-spin" />
                   <span>Ranking...</span>
                 </>
               ) : (
                 <>
-                  <Sparkles className="w-3.5 h-3.5 text-[#D4A359]" />
+                  <Sparkles className="w-4 h-4 text-[#E5C287]" />
                   <span>Semantic Search</span>
                 </>
               )}
@@ -245,7 +245,7 @@ export const EntryHistory: React.FC<EntryHistoryProps> = ({
 
         {/* Semantic Error Alert */}
         {semanticError && (
-          <div className="p-2.5 bg-[#FDF3F0] border border-[#FADCD5] rounded-xl flex items-center justify-between text-xs text-[#9E4733]">
+          <div className="p-3 bg-[#FDF3F0] border border-[#FADCD5] rounded-xl flex items-center justify-between text-xs sm:text-sm text-[#9E4733] font-medium">
             <div className="flex items-center gap-2">
               <AlertCircle className="w-4 h-4 shrink-0 text-[#C46A52]" />
               <span>{semanticError}</span>
@@ -254,16 +254,16 @@ export const EntryHistory: React.FC<EntryHistoryProps> = ({
               onClick={() => setSemanticError(null)}
               className="p-1 hover:text-[#1F1D1A] cursor-pointer"
             >
-              <X className="w-3.5 h-3.5" />
+              <X className="w-4 h-4" />
             </button>
           </div>
         )}
 
         {/* Active Semantic Filter Banner */}
         {activeSemanticQuery && semanticResults !== null ? (
-          <div className="flex items-center justify-between bg-[#F5EFE6] border border-[#E8DCB8] rounded-xl px-3.5 py-2">
-            <div className="flex items-center gap-2 text-xs text-[#8C6226] font-medium">
-              <Sparkles className="w-4 h-4 text-[#B88746] shrink-0" />
+          <div className="flex items-center justify-between bg-[#F5EFE6] border border-[#DFCBA8] rounded-xl px-4 py-2.5">
+            <div className="flex items-center gap-2 text-xs sm:text-sm text-[#593A12] font-semibold">
+              <Sparkles className="w-4 h-4 text-[#8C5E24] shrink-0" />
               <span>
                 Semantic ranking for: <strong className="text-[#1F1D1A]">"{activeSemanticQuery}"</strong> ({semanticResults.length} matches)
               </span>
@@ -271,22 +271,22 @@ export const EntryHistory: React.FC<EntryHistoryProps> = ({
             <button
               id="btn-clear-semantic-results"
               onClick={handleClearSemanticSearch}
-              className="text-xs font-semibold text-[#8C6226] hover:text-[#734F1F] hover:underline cursor-pointer flex items-center gap-1"
+              className="text-xs sm:text-sm font-bold text-[#593A12] hover:text-[#2A241F] hover:underline cursor-pointer flex items-center gap-1"
             >
-              <X className="w-3 h-3" />
+              <X className="w-3.5 h-3.5" />
               <span>Reset to all</span>
             </button>
           </div>
         ) : (
           /* Tag Filter Pills */
           allTags.length > 0 && (
-            <div className="flex items-center gap-1.5 overflow-x-auto py-1">
+            <div className="flex items-center gap-2 overflow-x-auto py-1">
               <button
                 onClick={() => setSelectedTag(null)}
-                className={`px-3 py-1 rounded-lg text-xs font-semibold transition-all cursor-pointer shrink-0 ${
+                className={`px-3.5 py-1.5 rounded-lg text-xs sm:text-sm font-bold transition-all cursor-pointer shrink-0 ${
                   selectedTag === null
                     ? 'bg-[#2A241F] text-white shadow-xs'
-                    : 'bg-[#F8F5F0] text-[#7C7469] hover:text-[#1F1D1A] hover:bg-[#EDE8E1]'
+                    : 'bg-[#FAF8F5] text-[#3D352E] hover:text-[#1F1D1A] hover:bg-[#F0EAE1] border border-[#E0D8CA]'
                 }`}
               >
                 All Tags
@@ -295,13 +295,13 @@ export const EntryHistory: React.FC<EntryHistoryProps> = ({
                 <button
                   key={tag}
                   onClick={() => setSelectedTag(selectedTag === tag ? null : tag)}
-                  className={`px-3 py-1 rounded-lg text-xs font-semibold transition-all cursor-pointer shrink-0 flex items-center gap-1 ${
+                  className={`px-3.5 py-1.5 rounded-lg text-xs sm:text-sm font-bold transition-all cursor-pointer shrink-0 flex items-center gap-1.5 ${
                     selectedTag === tag
                       ? 'bg-[#2A241F] text-white shadow-xs'
-                      : 'bg-[#F8F5F0] text-[#7C7469] hover:text-[#1F1D1A] hover:bg-[#EDE8E1]'
+                      : 'bg-[#FAF8F5] text-[#3D352E] hover:text-[#1F1D1A] hover:bg-[#F0EAE1] border border-[#E0D8CA]'
                   }`}
                 >
-                  <Hash className="w-3 h-3 opacity-60" />
+                  <Hash className="w-3.5 h-3.5 opacity-70" />
                   <span>{tag}</span>
                 </button>
               ))}
@@ -315,17 +315,17 @@ export const EntryHistory: React.FC<EntryHistoryProps> = ({
         {/* Case A: Semantic Results View */}
         {activeSemanticQuery && semanticResults !== null ? (
           semanticResults.length === 0 ? (
-            <div className="h-48 flex flex-col items-center justify-center text-center p-6 text-[#7C7469]">
-              <Sparkles className="w-8 h-8 text-[#9E9589] mb-2" />
-              <p className="text-sm font-semibold text-[#1F1D1A] mb-1">No semantic matches found</p>
-              <p className="text-xs text-[#9E9589] mb-4">
+            <div className="h-48 flex flex-col items-center justify-center text-center p-6 text-[#4D453B]">
+              <Sparkles className="w-8 h-8 text-[#8C5E24] mb-2" />
+              <p className="text-base font-bold text-[#1F1D1A] mb-1">No semantic matches found</p>
+              <p className="text-xs sm:text-sm text-[#3D352E] mb-4 font-normal">
                 {entriesWithEmbeddingsCount === 0 
                   ? 'No entries have vector embeddings yet. Save an entry to generate embeddings.'
                   : 'Try searching with different concepts or phrasing.'}
               </p>
               <button
                 onClick={handleClearSemanticSearch}
-                className="px-4 py-2 bg-[#B88746] hover:bg-[#A37438] text-white rounded-xl text-xs font-semibold transition-all shadow-xs cursor-pointer"
+                className="px-4 py-2 bg-[#8C5E24] hover:bg-[#734A18] text-white rounded-xl text-xs sm:text-sm font-bold transition-all shadow-xs cursor-pointer"
               >
                 Show All Entries
               </button>
@@ -342,37 +342,37 @@ export const EntryHistory: React.FC<EntryHistoryProps> = ({
                   key={entry.id}
                   id={`semantic-entry-card-${entry.id}`}
                   onClick={() => onSelectEntry(entry)}
-                  className={`p-4 rounded-xl border transition-all cursor-pointer group relative ${
+                  className={`p-4 sm:p-5 rounded-xl border transition-all cursor-pointer group relative shadow-2xs ${
                     isSelected
-                      ? 'bg-[#F8F5F0] border-[#E8DCB8] shadow-xs ring-1 ring-[#B88746]/20'
-                      : 'bg-[#FFFFFF] border-[#E8E2D7] hover:bg-[#FAF8F5] hover:border-[#D8CEBE]'
+                      ? 'bg-[#FDFBF7] border-[#8C5E24] shadow-xs ring-2 ring-[#8C5E24]/20'
+                      : 'bg-[#FFFFFF] border-[#E0D8CA] hover:bg-[#FAF8F5] hover:border-[#8C5E24]'
                   }`}
                 >
                   <div className="flex items-start justify-between gap-3 mb-1.5">
                     <div className="flex-1">
-                      <div className="flex items-center gap-2 mb-1 flex-wrap">
+                      <div className="flex items-center gap-2 mb-1.5 flex-wrap">
                         {/* Rank Badge */}
-                        <span className="text-[11px] font-bold px-2 py-0.5 rounded-md bg-[#1F1D1A] text-white font-mono">
+                        <span className="text-xs font-bold px-2.5 py-0.5 rounded-md bg-[#2A241F] text-white font-mono">
                           #{rank}
                         </span>
                         {/* Similarity Score Pill */}
-                        <span className="text-[11px] font-semibold px-2 py-0.5 rounded-md bg-[#F5EFE6] text-[#8C6226] border border-[#E8DCB8] flex items-center gap-1 font-mono">
-                          <Sparkles className="w-3 h-3 text-[#B88746]" />
+                        <span className="text-xs font-bold px-2.5 py-0.5 rounded-md bg-[#F5EFE6] text-[#593A12] border border-[#DFCBA8] flex items-center gap-1.5 font-mono">
+                          <Sparkles className="w-3.5 h-3.5 text-[#8C5E24]" />
                           <span>{similarityPercentage}% semantic match</span>
                         </span>
                         {entry.embeddingModel && (
-                          <span className="text-[10px] text-[#9E9589] font-mono">
+                          <span className="text-xs text-[#6B6052] font-mono">
                             ({entry.embeddingModel})
                           </span>
                         )}
                       </div>
 
-                      <h3 className="text-sm sm:text-base font-serif font-bold text-[#1F1D1A] group-hover:text-[#8C6226] transition-colors">
+                      <h3 className="text-base sm:text-lg font-serif font-bold text-[#1F1D1A] group-hover:text-[#593A12] transition-colors">
                         {entry.title || 'Untitled Reflection'}
                       </h3>
-                      <div className="flex items-center gap-2 text-[11px] text-[#7C7469] mt-0.5 font-medium">
+                      <div className="flex items-center gap-2 text-xs sm:text-sm text-[#4D453B] mt-1 font-semibold flex-wrap">
                         <span className="flex items-center gap-1">
-                          <Calendar className="w-3 h-3 text-[#9E9589]" />
+                          <Calendar className="w-3.5 h-3.5 text-[#8C5E24]" />
                           {new Date(entry.createdAt).toLocaleDateString(undefined, {
                             month: 'short',
                             day: 'numeric',
@@ -381,13 +381,15 @@ export const EntryHistory: React.FC<EntryHistoryProps> = ({
                         </span>
                         <span>•</span>
                         <span className="flex items-center gap-1">
-                          <MessageSquare className="w-3 h-3 text-[#B88746]" />
+                          <MessageSquare className="w-3.5 h-3.5 text-[#8C5E24]" />
                           {messageCount} AI turns
                         </span>
                         {entry.summaryData?.sentiment && (
                           <>
                             <span>•</span>
-                            <span className="text-[#8C6226] font-semibold">{entry.summaryData.sentiment}</span>
+                            <span className="text-[#593A12] font-bold bg-[#F5EFE6] px-2 py-0.5 rounded-md border border-[#DFCBA8]">
+                              {entry.summaryData.sentiment}
+                            </span>
                           </>
                         )}
                       </div>
@@ -399,32 +401,32 @@ export const EntryHistory: React.FC<EntryHistoryProps> = ({
                         id={`btn-delete-entry-${entry.id}`}
                         onClick={(e) => handleDelete(e, entry.id, entry.title)}
                         title="Delete Entry"
-                        className="p-1.5 text-[#9E9589] hover:text-[#9E4733] hover:bg-[#FDF3F0] rounded-lg transition-colors cursor-pointer"
+                        className="p-2 text-[#6B6052] hover:text-[#9E4733] hover:bg-[#FDF3F0] rounded-lg transition-colors cursor-pointer"
                       >
-                        <Trash2 className="w-3.5 h-3.5" />
+                        <Trash2 className="w-4 h-4" />
                       </button>
-                      <ChevronRight className="w-4 h-4 text-[#9E9589] group-hover:text-[#8C6226] transition-transform group-hover:translate-x-0.5" />
+                      <ChevronRight className="w-4.5 h-4.5 text-[#8C5E24] group-hover:text-[#593A12] transition-transform group-hover:translate-x-0.5" />
                     </div>
                   </div>
 
                   {snippet && (
-                    <p className="text-xs text-[#423A31] leading-relaxed line-clamp-2 mb-2 font-normal">
+                    <p className="text-xs sm:text-sm text-[#24201C] leading-relaxed line-clamp-2 mb-2 font-normal">
                       {snippet}
                     </p>
                   )}
 
                   {/* Tags & Insights summary */}
-                  <div className="flex flex-wrap items-center gap-1.5 mt-2 pt-2 border-t border-[#EAE4DC]">
+                  <div className="flex flex-wrap items-center gap-1.5 mt-2.5 pt-2.5 border-t border-[#EAE4DC]">
                     {entry.tags && entry.tags.map((t) => (
                       <span
                         key={t}
-                        className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-[#F5EFE6] text-[#8C6226] border border-[#E8DCB8]"
+                        className="text-xs font-bold px-2.5 py-0.5 rounded-full bg-[#F5EFE6] text-[#593A12] border border-[#DFCBA8]"
                       >
                         #{t}
                       </span>
                     ))}
                     {entry.summaryData?.keyInsight && (
-                      <span className="text-[10px] text-[#8C6226] font-medium italic truncate max-w-xs ml-auto">
+                      <span className="text-xs sm:text-sm text-[#593A12] font-semibold italic truncate max-w-sm ml-auto">
                         &ldquo;{entry.summaryData.keyInsight}&rdquo;
                       </span>
                     )}
@@ -436,9 +438,9 @@ export const EntryHistory: React.FC<EntryHistoryProps> = ({
         ) : (
           /* Case B: Standard / Filtered Entry List View */
           filteredEntries.length === 0 ? (
-            <div className="h-48 flex flex-col items-center justify-center text-center p-6 text-[#7C7469]">
-              <p className="text-sm font-semibold text-[#1F1D1A] mb-1">No reflections found</p>
-              <p className="text-xs text-[#9E9589] mb-4">
+            <div className="h-48 flex flex-col items-center justify-center text-center p-6 text-[#4D453B]">
+              <p className="text-base font-bold text-[#1F1D1A] mb-1">No reflections found</p>
+              <p className="text-xs sm:text-sm text-[#3D352E] mb-4 font-normal">
                 {searchQuery || selectedTag
                   ? 'Try adjusting your search criteria or clicking "Semantic Search" to search by concept.'
                   : 'Start your first reflection with Gemini!'}
@@ -446,7 +448,7 @@ export const EntryHistory: React.FC<EntryHistoryProps> = ({
               {!searchQuery && !selectedTag && (
                 <button
                   onClick={onNewEntry}
-                  className="px-4 py-2 bg-[#B88746] hover:bg-[#A37438] text-white rounded-xl text-xs font-semibold transition-all shadow-xs cursor-pointer"
+                  className="px-4.5 py-2 bg-[#8C5E24] hover:bg-[#734A18] text-white rounded-xl text-xs sm:text-sm font-bold transition-all shadow-xs cursor-pointer"
                 >
                   Write First Reflection
                 </button>
@@ -463,20 +465,20 @@ export const EntryHistory: React.FC<EntryHistoryProps> = ({
                   key={entry.id}
                   id={`entry-card-${entry.id}`}
                   onClick={() => onSelectEntry(entry)}
-                  className={`p-4 rounded-xl border transition-all cursor-pointer group relative ${
+                  className={`p-4 sm:p-5 rounded-xl border transition-all cursor-pointer group relative shadow-2xs ${
                     isSelected
-                      ? 'bg-[#F8F5F0] border-[#E8DCB8] shadow-xs ring-1 ring-[#B88746]/20'
-                      : 'bg-[#FFFFFF] border-[#E8E2D7] hover:bg-[#FAF8F5] hover:border-[#D8CEBE]'
+                      ? 'bg-[#FDFBF7] border-[#8C5E24] shadow-xs ring-2 ring-[#8C5E24]/20'
+                      : 'bg-[#FFFFFF] border-[#E0D8CA] hover:bg-[#FAF8F5] hover:border-[#8C5E24]'
                   }`}
                 >
                   <div className="flex items-start justify-between gap-3 mb-1.5">
                     <div className="flex-1">
-                      <h3 className="text-sm sm:text-base font-serif font-bold text-[#1F1D1A] group-hover:text-[#8C6226] transition-colors">
+                      <h3 className="text-base sm:text-lg font-serif font-bold text-[#1F1D1A] group-hover:text-[#593A12] transition-colors">
                         {entry.title || 'Untitled Reflection'}
                       </h3>
-                      <div className="flex items-center gap-2 text-[11px] text-[#7C7469] mt-0.5 font-medium">
+                      <div className="flex items-center gap-2 text-xs sm:text-sm text-[#4D453B] mt-1 font-semibold flex-wrap">
                         <span className="flex items-center gap-1">
-                          <Calendar className="w-3 h-3 text-[#9E9589]" />
+                          <Calendar className="w-3.5 h-3.5 text-[#8C5E24]" />
                           {new Date(entry.createdAt).toLocaleDateString(undefined, {
                             month: 'short',
                             day: 'numeric',
@@ -485,17 +487,19 @@ export const EntryHistory: React.FC<EntryHistoryProps> = ({
                         </span>
                         <span>•</span>
                         <span className="flex items-center gap-1">
-                          <MessageSquare className="w-3 h-3 text-[#B88746]" />
+                          <MessageSquare className="w-3.5 h-3.5 text-[#8C5E24]" />
                           {messageCount} AI turns
                         </span>
                         {entry.summaryData?.sentiment && (
                           <>
                             <span>•</span>
-                            <span className="text-[#8C6226] font-semibold">{entry.summaryData.sentiment}</span>
+                            <span className="text-[#593A12] font-bold bg-[#F5EFE6] px-2 py-0.5 rounded-md border border-[#DFCBA8]">
+                              {entry.summaryData.sentiment}
+                            </span>
                           </>
                         )}
                         {entry.embedding && (
-                          <span className="text-[10px] px-1.5 py-0.2 rounded bg-[#F5EFE6] text-[#8C6226] font-mono border border-[#E8DCB8]">
+                          <span className="text-xs font-bold px-2 py-0.5 rounded bg-[#F5EFE6] text-[#593A12] font-mono border border-[#DFCBA8]">
                             vector-indexed
                           </span>
                         )}
@@ -508,32 +512,32 @@ export const EntryHistory: React.FC<EntryHistoryProps> = ({
                         id={`btn-delete-entry-${entry.id}`}
                         onClick={(e) => handleDelete(e, entry.id, entry.title)}
                         title="Delete Entry"
-                        className="p-1.5 text-[#9E9589] hover:text-[#9E4733] hover:bg-[#FDF3F0] rounded-lg transition-colors cursor-pointer"
+                        className="p-2 text-[#6B6052] hover:text-[#9E4733] hover:bg-[#FDF3F0] rounded-lg transition-colors cursor-pointer"
                       >
-                        <Trash2 className="w-3.5 h-3.5" />
+                        <Trash2 className="w-4 h-4" />
                       </button>
-                      <ChevronRight className="w-4 h-4 text-[#9E9589] group-hover:text-[#8C6226] transition-transform group-hover:translate-x-0.5" />
+                      <ChevronRight className="w-4.5 h-4.5 text-[#8C5E24] group-hover:text-[#593A12] transition-transform group-hover:translate-x-0.5" />
                     </div>
                   </div>
 
                   {snippet && (
-                    <p className="text-xs text-[#423A31] leading-relaxed line-clamp-2 mb-2 font-normal">
+                    <p className="text-xs sm:text-sm text-[#24201C] leading-relaxed line-clamp-2 mb-2 font-normal">
                       {snippet}
                     </p>
                   )}
 
                   {/* Tags & Insights summary */}
-                  <div className="flex flex-wrap items-center gap-1.5 mt-2 pt-2 border-t border-[#EAE4DC]">
+                  <div className="flex flex-wrap items-center gap-1.5 mt-2.5 pt-2.5 border-t border-[#EAE4DC]">
                     {entry.tags && entry.tags.map((t) => (
                       <span
                         key={t}
-                        className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-[#F5EFE6] text-[#8C6226] border border-[#E8DCB8]"
+                        className="text-xs font-bold px-2.5 py-0.5 rounded-full bg-[#F5EFE6] text-[#593A12] border border-[#DFCBA8]"
                       >
                         #{t}
                       </span>
                     ))}
                     {entry.summaryData?.keyInsight && (
-                      <span className="text-[10px] text-[#8C6226] font-medium italic truncate max-w-xs ml-auto">
+                      <span className="text-xs sm:text-sm text-[#593A12] font-semibold italic truncate max-w-sm ml-auto">
                         &ldquo;{entry.summaryData.keyInsight}&rdquo;
                       </span>
                     )}
@@ -547,11 +551,11 @@ export const EntryHistory: React.FC<EntryHistoryProps> = ({
 
       {/* Footer Info */}
       {entries.length > 0 && (
-        <div className="pt-3 border-t border-[#EAE4DC] text-[11px] text-[#9E9589] flex items-center justify-between flex-wrap gap-2">
+        <div className="pt-3 border-t border-[#EAE4DC] text-xs sm:text-sm text-[#4D453B] font-semibold flex items-center justify-between flex-wrap gap-2">
           <span>
             {entriesWithEmbeddingsCount} of {entries.length} entries vector-indexed for semantic search
           </span>
-          <span className="text-[#8C6226] font-medium">
+          <span className="text-[#593A12] font-bold">
             User-isolated cosine similarity
           </span>
         </div>
@@ -565,37 +569,37 @@ export const EntryHistory: React.FC<EntryHistoryProps> = ({
           onClick={handleCancelDelete}
         >
           <div
-            className="bg-[#FFFFFF] border border-[#E8E2D7] rounded-2xl p-5 sm:p-6 max-w-sm w-full shadow-lg relative space-y-4 animate-in zoom-in-95 duration-150"
+            className="bg-[#FFFFFF] border border-[#E0D8CA] rounded-2xl p-5 sm:p-6 max-w-md w-full shadow-xl relative space-y-4 animate-in zoom-in-95 duration-150 text-[#1F1D1A]"
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="flex items-start gap-3">
-              <div className="p-2.5 bg-[#FDF3F0] text-[#9E4733] rounded-xl shrink-0 border border-[#FADCD5]">
+            <div className="flex items-start gap-3.5">
+              <div className="p-3 bg-[#FDF3F0] text-[#9E4733] rounded-xl shrink-0 border border-[#FADCD5]">
                 <Trash2 className="w-5 h-5" />
               </div>
               <div className="flex-1 min-w-0">
-                <h3 className="text-base font-serif font-bold text-[#1F1D1A]">
+                <h3 className="text-lg font-serif font-bold text-[#1F1D1A]">
                   Delete Reflection?
                 </h3>
-                <p className="text-xs text-[#7C7469] mt-1 leading-relaxed">
+                <p className="text-xs sm:text-sm text-[#3D352E] mt-1.5 leading-relaxed font-normal">
                   Are you sure you want to delete <strong className="text-[#1F1D1A]">"{entryToDelete.title}"</strong>? This will permanently remove it from your Firestore journal and vector index. This action cannot be undone.
                 </p>
               </div>
             </div>
 
             {deleteError && (
-              <div className="p-2.5 bg-[#FDF3F0] border border-[#FADCD5] rounded-xl flex items-center gap-2 text-xs text-[#9E4733]">
-                <AlertCircle className="w-4 h-4 shrink-0" />
+              <div className="p-3 bg-[#FDF3F0] border border-[#FADCD5] rounded-xl flex items-center gap-2 text-xs sm:text-sm text-[#9E4733] font-medium">
+                <AlertCircle className="w-4 h-4 shrink-0 text-[#C46A52]" />
                 <span>{deleteError}</span>
               </div>
             )}
 
-            <div className="flex items-center justify-end gap-2 pt-2 border-t border-[#EAE4DC]">
+            <div className="flex items-center justify-end gap-2.5 pt-3 border-t border-[#EAE4DC]">
               <button
                 id="btn-cancel-delete-modal"
                 type="button"
                 disabled={isDeleting}
                 onClick={handleCancelDelete}
-                className="px-4 py-2 text-xs font-semibold text-[#7C7469] hover:text-[#1F1D1A] hover:bg-[#FAF8F5] border border-[#E8E2D7] rounded-xl transition-all cursor-pointer disabled:opacity-50"
+                className="px-4.5 py-2 text-xs sm:text-sm font-bold text-[#3D352E] hover:text-[#1F1D1A] hover:bg-[#FAF8F5] border border-[#E0D8CA] rounded-xl transition-all cursor-pointer disabled:opacity-50"
               >
                 Cancel
               </button>
@@ -604,16 +608,16 @@ export const EntryHistory: React.FC<EntryHistoryProps> = ({
                 type="button"
                 disabled={isDeleting}
                 onClick={handleConfirmDelete}
-                className="flex items-center justify-center gap-1.5 px-4 py-2 text-xs font-semibold text-white bg-[#9E4733] hover:bg-[#853B2A] rounded-xl transition-all shadow-xs cursor-pointer disabled:opacity-50"
+                className="flex items-center justify-center gap-1.5 px-4.5 py-2 text-xs sm:text-sm font-bold text-white bg-[#9E4733] hover:bg-[#853B2A] rounded-xl transition-all shadow-xs cursor-pointer disabled:opacity-50"
               >
                 {isDeleting ? (
                   <>
-                    <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                    <Loader2 className="w-4 h-4 animate-spin" />
                     <span>Deleting...</span>
                   </>
                 ) : (
                   <>
-                    <Trash2 className="w-3.5 h-3.5" />
+                    <Trash2 className="w-4 h-4" />
                     <span>Delete</span>
                   </>
                 )}

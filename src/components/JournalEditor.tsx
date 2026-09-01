@@ -206,11 +206,11 @@ export const JournalEditor: React.FC<JournalEditorProps> = ({
             value={entry.title}
             onChange={(e) => onUpdateEntry({ title: e.target.value })}
             placeholder="Title of this reflection..."
-            className="w-full bg-transparent text-xl sm:text-2xl font-serif font-bold text-[#1F1D1A] placeholder-[#9E9589] focus:outline-none focus:ring-2 focus:ring-[#B88746]/20 rounded-lg px-2 -ml-2 transition-all"
+            className="w-full bg-transparent text-xl sm:text-2xl font-serif font-bold text-[#1F1D1A] placeholder-[#6B6052] focus:outline-none focus:ring-2 focus:ring-[#8C5E24]/25 rounded-lg px-2 -ml-2 transition-all"
           />
-          <div className="flex items-center gap-3 text-xs text-[#7C7469] mt-1 pl-0.5">
-            <span className="flex items-center gap-1 font-medium">
-              <Clock className="w-3.5 h-3.5 text-[#9E9589]" />
+          <div className="flex items-center gap-3 text-xs sm:text-sm text-[#4D453B] mt-1 pl-0.5 font-medium">
+            <span className="flex items-center gap-1.5 font-semibold text-[#3D352E]">
+              <Clock className="w-4 h-4 text-[#8C5E24]" />
               {new Date(entry.createdAt).toLocaleDateString(undefined, {
                 weekday: 'short',
                 month: 'short',
@@ -219,9 +219,9 @@ export const JournalEditor: React.FC<JournalEditorProps> = ({
                 minute: '2-digit',
               })}
             </span>
-            <span>•</span>
+            <span className="text-[#A89884]">•</span>
             <span>{wordCount} words</span>
-            <span>•</span>
+            <span className="text-[#A89884]">•</span>
             <span>{charCount} chars</span>
           </div>
         </div>
@@ -234,12 +234,12 @@ export const JournalEditor: React.FC<JournalEditorProps> = ({
             onClick={onGenerateSummary}
             disabled={isSummarizing || !entry.content.trim()}
             title="Generate AI summary, emotional tone & key insight"
-            className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-semibold bg-[#F5EFE6] text-[#8C6226] hover:bg-[#EDE3D4] border border-[#E8DCB8] transition-all disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer shadow-xs"
+            className="flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs sm:text-sm font-bold bg-[#F5EFE6] text-[#593A12] hover:bg-[#EDE3D4] border border-[#DFCBA8] transition-all disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer shadow-xs"
           >
             {isSummarizing ? (
-              <RefreshCw className="w-3.5 h-3.5 animate-spin text-[#B88746]" />
+              <RefreshCw className="w-4 h-4 animate-spin text-[#8C5E24]" />
             ) : (
-              <Wand2 className="w-3.5 h-3.5 text-[#B88746]" />
+              <Wand2 className="w-4 h-4 text-[#8C5E24]" />
             )}
             <span>{isSummarizing ? 'Analyzing...' : 'AI Summary'}</span>
           </button>
@@ -249,18 +249,18 @@ export const JournalEditor: React.FC<JournalEditorProps> = ({
             id="btn-save-entry"
             onClick={onSaveEntry}
             disabled={isSaving}
-            className={`flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-semibold transition-all shadow-xs cursor-pointer ${
+            className={`flex items-center gap-1.5 px-4.5 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all shadow-xs cursor-pointer ${
               saveStatus === 'saved'
-                ? 'bg-[#3D332A] text-white shadow-xs'
-                : 'bg-[#B88746] hover:bg-[#A37438] text-white'
+                ? 'bg-[#2A241F] text-white shadow-xs'
+                : 'bg-[#8C5E24] hover:bg-[#734A18] text-white'
             } disabled:opacity-50`}
           >
             {isSaving ? (
-              <RefreshCw className="w-3.5 h-3.5 animate-spin" />
+              <RefreshCw className="w-4 h-4 animate-spin" />
             ) : saveStatus === 'saved' ? (
-              <Check className="w-3.5 h-3.5 text-[#E0B574]" />
+              <Check className="w-4 h-4 text-[#E5C287]" />
             ) : (
-              <Save className="w-3.5 h-3.5" />
+              <Save className="w-4 h-4" />
             )}
             <span>{isSaving ? 'Saving...' : saveStatus === 'saved' ? 'Saved' : 'Save to Firestore'}</span>
           </button>
@@ -269,14 +269,14 @@ export const JournalEditor: React.FC<JournalEditorProps> = ({
 
       {/* Error banner if save fails */}
       {errorMessage && (
-        <div className="p-3 bg-[#FDF3F0] border border-[#FADCD5] rounded-xl text-[#9E4733] text-xs flex items-center justify-between gap-2 shadow-xs">
+        <div className="p-3.5 bg-[#FDF3F0] border border-[#FADCD5] rounded-xl text-[#9E4733] text-xs sm:text-sm flex items-center justify-between gap-2 shadow-xs font-medium">
           <div className="flex items-center gap-2">
             <AlertCircle className="w-4 h-4 text-[#C46A52] shrink-0" />
             <span>{errorMessage}</span>
           </div>
           <button 
             onClick={onSaveEntry}
-            className="px-2.5 py-1 bg-[#9E4733] hover:bg-[#853B2A] rounded-lg text-white font-semibold transition-colors cursor-pointer"
+            className="px-3 py-1 bg-[#9E4733] hover:bg-[#853B2A] rounded-lg text-white font-semibold transition-colors cursor-pointer text-xs"
           >
             Retry Save
           </button>
@@ -285,8 +285,8 @@ export const JournalEditor: React.FC<JournalEditorProps> = ({
 
       {/* Quick Prompt Templates Pill Strip */}
       <div className="flex flex-wrap items-center gap-2">
-        <span className="text-xs font-semibold text-[#7C7469] flex items-center gap-1">
-          <Lightbulb className="w-3.5 h-3.5 text-[#B88746]" />
+        <span className="text-xs sm:text-sm font-bold text-[#2D2620] flex items-center gap-1.5">
+          <Lightbulb className="w-4 h-4 text-[#8C5E24]" />
           <span>Prompts:</span>
         </span>
         {PROMPT_TEMPLATES.map((tpl, i) => (
@@ -294,7 +294,7 @@ export const JournalEditor: React.FC<JournalEditorProps> = ({
             key={i}
             id={`btn-prompt-template-${i}`}
             onClick={() => applyTemplate(tpl.prompt)}
-            className="text-xs font-medium px-3 py-1 rounded-lg bg-[#F8F5F0] hover:bg-[#EFE9E0] text-[#423A31] hover:text-[#1F1D1A] border border-[#EAE4DC] transition-all cursor-pointer shadow-xs"
+            className="text-xs sm:text-sm font-semibold px-3 py-1.5 rounded-lg bg-[#FAF8F5] hover:bg-[#F5EFE6] text-[#2D2620] hover:text-[#1F1D1A] border border-[#E0D8CA] hover:border-[#DFCBA8] transition-all cursor-pointer shadow-2xs"
           >
             {tpl.label}
           </button>
@@ -309,25 +309,25 @@ export const JournalEditor: React.FC<JournalEditorProps> = ({
           onChange={(e) => onUpdateEntry({ content: e.target.value })}
           placeholder="Write your raw thoughts, questions, or analytical reflections here..."
           rows={10}
-          className="w-full bg-[#FAF8F5] border border-[#E8E2D7] rounded-xl p-4 text-[#1F1D1A] placeholder-[#9E9589] font-sans text-sm sm:text-base leading-relaxed focus:outline-none focus:border-[#B88746] focus:ring-2 focus:ring-[#B88746]/20 transition-all resize-y min-h-[220px]"
+          className="w-full bg-[#FAF8F5] border border-[#E0D8CA] rounded-xl p-4 text-[#1F1D1A] placeholder-[#6B6052] font-sans text-base sm:text-lg leading-relaxed focus:outline-none focus:border-[#8C5E24] focus:ring-2 focus:ring-[#8C5E24]/20 transition-all resize-y min-h-[220px]"
         />
       </div>
 
       {/* Tags Section */}
       <div className="flex flex-wrap items-center gap-2 pt-2 border-t border-[#EAE4DC]">
-        <div className="flex items-center gap-1.5 text-xs font-semibold text-[#7C7469]">
-          <Tag className="w-3.5 h-3.5 text-[#B88746]" />
+        <div className="flex items-center gap-1.5 text-xs sm:text-sm font-bold text-[#2D2620]">
+          <Tag className="w-4 h-4 text-[#8C5E24]" />
           <span>Tags:</span>
         </div>
         {(entry.tags || []).map((t) => (
           <span
             key={t}
-            className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-[#F5EFE6] text-[#8C6226] border border-[#E8DCB8] shadow-xs"
+            className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs sm:text-sm font-bold bg-[#F5EFE6] text-[#593A12] border border-[#DFCBA8] shadow-2xs"
           >
             #{t}
             <button
               onClick={() => handleRemoveTag(t)}
-              className="text-[#A37438] hover:text-[#734F1F] ml-1 font-bold cursor-pointer"
+              className="text-[#8C5E24] hover:text-[#593A12] ml-0.5 font-bold cursor-pointer text-sm leading-none"
             >
               &times;
             </button>
@@ -340,42 +340,42 @@ export const JournalEditor: React.FC<JournalEditorProps> = ({
           onChange={(e) => setNewTagInput(e.target.value)}
           onKeyDown={handleAddTag}
           placeholder="+ Add tag (Press Enter)"
-          className="bg-transparent text-xs text-[#423A31] placeholder-[#9E9589] px-2 py-0.5 rounded-lg border border-transparent focus:border-[#E8DCB8] focus:outline-none"
+          className="bg-transparent text-xs sm:text-sm text-[#1F1D1A] placeholder-[#6B6052] font-medium px-2.5 py-1 rounded-lg border border-transparent focus:border-[#DFCBA8] focus:outline-none"
         />
       </div>
 
       {/* Structured AI Summary Insights & Recommended Reads Deck */}
       {entry.summaryData && (
-        <div className="mt-2 p-4 sm:p-5 rounded-xl bg-[#FAF8F5] border border-[#E8E2D7] text-[#1F1D1A] shadow-xs">
+        <div className="mt-2 p-4 sm:p-5 rounded-xl bg-[#FAF8F5] border border-[#E0D8CA] text-[#1F1D1A] shadow-xs">
           <div className="flex items-center justify-between mb-2">
-            <span className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-[#8C6226]">
-              <Sparkles className="w-3.5 h-3.5 text-[#B88746]" />
+            <span className="flex items-center gap-1.5 text-xs sm:text-sm font-bold uppercase tracking-wider text-[#593A12]">
+              <Sparkles className="w-4 h-4 text-[#8C5E24]" />
               Gemini Synthesis
             </span>
             {entry.summaryData.sentiment && (
-              <span className="px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-[#F5EFE6] text-[#8C6226] border border-[#E8DCB8]">
+              <span className="px-3 py-1 rounded-full text-xs sm:text-sm font-bold bg-[#F5EFE6] text-[#593A12] border border-[#DFCBA8]">
                 Tone: {entry.summaryData.sentiment}
               </span>
             )}
           </div>
 
           {entry.summaryData.summary && (
-            <p className="text-xs sm:text-sm text-[#423A31] mb-3 leading-relaxed">
+            <p className="text-sm sm:text-base text-[#1F1D1A] mb-3 leading-relaxed font-normal">
               {entry.summaryData.summary}
             </p>
           )}
 
           {entry.summaryData.keyInsight && (
-            <div className="p-3 rounded-xl bg-[#FFFFFF] border border-[#E8DCB8] text-xs sm:text-sm text-[#423A31] font-serif font-medium italic mb-3 shadow-xs">
+            <div className="p-3.5 rounded-xl bg-[#FFFFFF] border border-[#DFCBA8] text-sm sm:text-base text-[#1F1D1A] font-serif font-semibold italic mb-3 shadow-2xs">
               &ldquo;{entry.summaryData.keyInsight}&rdquo;
             </div>
           )}
 
           {entry.summaryData.keyThemes && entry.summaryData.keyThemes.length > 0 && (
-            <div className="flex flex-wrap items-center gap-1.5 text-xs">
-              <span className="text-[#7C7469] font-medium text-[11px]">Identified Themes:</span>
+            <div className="flex flex-wrap items-center gap-2 text-xs sm:text-sm">
+              <span className="text-[#3D352E] font-bold">Identified Themes:</span>
               {entry.summaryData.keyThemes.map((th, i) => (
-                <span key={i} className="px-2.5 py-0.5 rounded-lg bg-[#F5EFE6] text-[#8C6226] font-medium text-[11px] border border-[#E8DCB8]">
+                <span key={i} className="px-3 py-1 rounded-lg bg-[#F5EFE6] text-[#593A12] font-semibold text-xs sm:text-sm border border-[#DFCBA8]">
                   {th}
                 </span>
               ))}
@@ -385,15 +385,15 @@ export const JournalEditor: React.FC<JournalEditorProps> = ({
           {/* Recommended Reads - Stacked Deck with Google Books Cover Art */}
           <div className="mt-5 pt-4 border-t border-[#EAE4DC]">
             <div className="flex items-center justify-between mb-3">
-              <span className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-[#8C6226]">
-                <BookOpen className="w-4 h-4 text-[#B88746]" />
+              <span className="flex items-center gap-1.5 text-xs sm:text-sm font-bold uppercase tracking-wider text-[#593A12]">
+                <BookOpen className="w-4 h-4 text-[#8C5E24]" />
                 Recommended Reads
-                <span className="text-[10px] lowercase font-normal px-2.5 py-0.5 rounded-full bg-[#F5EFE6] text-[#8C6226] border border-[#E8DCB8] tracking-normal">
+                <span className="text-xs lowercase font-semibold px-2.5 py-0.5 rounded-full bg-[#F5EFE6] text-[#593A12] border border-[#DFCBA8] tracking-normal">
                   Google Books API
                 </span>
               </span>
-              <span className="text-xs font-medium text-[#7C7469] flex items-center gap-1.5 bg-[#FFFFFF] px-2.5 py-1 rounded-lg border border-[#E8E2D7]">
-                <Layers className="w-3.5 h-3.5 text-[#B88746]" />
+              <span className="text-xs sm:text-sm font-bold text-[#3D352E] flex items-center gap-1.5 bg-[#FFFFFF] px-3 py-1 rounded-lg border border-[#E0D8CA] shadow-2xs">
+                <Layers className="w-3.5 h-3.5 text-[#8C5E24]" />
                 <span>Card {((activeBookIndex % currentBooks.length) + 1)} of {currentBooks.length} · Tap card to cycle</span>
               </span>
             </div>
@@ -401,7 +401,7 @@ export const JournalEditor: React.FC<JournalEditorProps> = ({
             <div
               id="recommended-reads-deck"
               onClick={() => setActiveBookIndex((prev) => (prev + 1) % currentBooks.length)}
-              className="relative h-[156px] sm:h-[152px] w-full cursor-pointer select-none mb-3"
+              className="relative h-[164px] sm:h-[160px] w-full cursor-pointer select-none mb-3"
               role="button"
               tabIndex={0}
               aria-label="Recommended Reads stacked cards, click or tap to cycle"
@@ -476,23 +476,23 @@ export const JournalEditor: React.FC<JournalEditorProps> = ({
                           />
                         </div>
                       ) : (
-                        <div className="w-18 h-26 sm:w-22 sm:h-29 rounded-xl bg-[#F5EFE6] border border-[#E8DCB8] flex flex-col items-center justify-center text-[#8C6226] shrink-0 font-bold text-xs gap-1.5 shadow-xs p-2 text-center">
-                          <BookOpen className="w-6 h-6 text-[#B88746]" />
-                          <span className="text-[9px] font-bold text-[#8C6226] uppercase tracking-wider">Book</span>
+                        <div className="w-18 h-26 sm:w-22 sm:h-29 rounded-xl bg-[#F5EFE6] border border-[#DFCBA8] flex flex-col items-center justify-center text-[#593A12] shrink-0 font-bold text-xs gap-1.5 shadow-xs p-2 text-center">
+                          <BookOpen className="w-6 h-6 text-[#8C5E24]" />
+                          <span className="text-xs font-bold text-[#593A12] uppercase tracking-wider">Book</span>
                         </div>
                       )}
 
                       {/* Book Details: Title, Author, Thematic Takeaway */}
                       <div className="min-w-0 flex-1 flex flex-col justify-center">
-                        <h4 className="text-sm sm:text-base font-serif font-bold text-[#1F1D1A] leading-snug line-clamp-2">
+                        <h4 className="text-base sm:text-lg font-serif font-bold text-[#1F1D1A] leading-snug line-clamp-2">
                           {book.title}
                         </h4>
-                        <p className="text-xs sm:text-sm text-[#8C6226] font-semibold mt-0.5 truncate">
+                        <p className="text-sm sm:text-base text-[#593A12] font-bold mt-0.5 truncate">
                           by {book.author}
                         </p>
                         {book.tag && (
                           <div className="mt-1.5 flex items-center gap-1.5">
-                            <span className="text-[11px] sm:text-xs text-[#7C7469] bg-[#F8F5F0] border border-[#EAE4DC] px-2.5 py-0.5 rounded-lg line-clamp-1 font-medium">
+                            <span className="text-xs sm:text-sm text-[#2D2620] bg-[#F5EFE6] border border-[#DFCBA8] px-2.5 py-0.5 rounded-lg line-clamp-1 font-semibold">
                               {book.tag}
                             </span>
                           </div>
@@ -509,13 +509,13 @@ export const JournalEditor: React.FC<JournalEditorProps> = ({
                           rel="noopener noreferrer"
                           onClick={(e) => e.stopPropagation()}
                           title="View on Google Books"
-                          className="flex items-center gap-1 px-2.5 py-1.5 rounded-xl bg-[#FAF8F5] hover:bg-[#EFE9E0] text-[#7C7469] hover:text-[#1F1D1A] border border-[#EAE4DC] text-xs font-semibold transition-all cursor-pointer shadow-xs"
+                          className="flex items-center gap-1 px-3 py-1.5 rounded-xl bg-[#FAF8F5] hover:bg-[#EFE9E0] text-[#2D2620] hover:text-[#1F1D1A] border border-[#DFCBA8] text-xs sm:text-sm font-bold transition-all cursor-pointer shadow-xs"
                         >
                           <span className="hidden sm:inline">Preview</span>
-                          <ExternalLink className="w-3.5 h-3.5 text-[#B88746]" />
+                          <ExternalLink className="w-3.5 h-3.5 text-[#8C5E24]" />
                         </a>
                       )}
-                      <div className="flex items-center gap-1 text-[11px] font-semibold text-[#8C6226] bg-[#F5EFE6] px-2.5 py-1.5 rounded-xl border border-[#E8DCB8]">
+                      <div className="flex items-center gap-1 text-xs sm:text-sm font-bold text-[#593A12] bg-[#F5EFE6] px-3 py-1.5 rounded-xl border border-[#DFCBA8]">
                         <span>{index + 1}/{currentBooks.length}</span>
                         <span className="hidden sm:inline">· Next ↻</span>
                       </div>
@@ -530,16 +530,16 @@ export const JournalEditor: React.FC<JournalEditorProps> = ({
 
       {/* Entry Threading / Related Reflections */}
       {relatedReflections.length > 0 && (
-        <div id="section-related-reflections" className="mt-2 p-4 sm:p-5 rounded-xl bg-[#FAF8F5] border border-[#E8E2D7] text-[#1F1D1A] shadow-xs space-y-3">
+        <div id="section-related-reflections" className="mt-2 p-4 sm:p-5 rounded-xl bg-[#FAF8F5] border border-[#E0D8CA] text-[#1F1D1A] shadow-xs space-y-3">
           <div className="flex items-center justify-between">
-            <span className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-[#8C6226]">
-              <GitFork className="w-3.5 h-3.5 text-[#B88746]" />
+            <span className="flex items-center gap-1.5 text-xs sm:text-sm font-bold uppercase tracking-wider text-[#593A12]">
+              <GitFork className="w-4 h-4 text-[#8C5E24]" />
               Related Reflections
-              <span className="text-[10px] lowercase font-normal px-2.5 py-0.5 rounded-full bg-[#F5EFE6] text-[#8C6226] border border-[#E8DCB8] tracking-normal">
+              <span className="text-xs lowercase font-semibold px-2.5 py-0.5 rounded-full bg-[#F5EFE6] text-[#593A12] border border-[#DFCBA8] tracking-normal">
                 Semantic Threading
               </span>
             </span>
-            <span className="text-xs font-medium text-[#7C7469] flex items-center gap-1 bg-[#FFFFFF] px-2.5 py-1 rounded-lg border border-[#E8E2D7]">
+            <span className="text-xs sm:text-sm font-bold text-[#3D352E] flex items-center gap-1 bg-[#FFFFFF] px-3 py-1 rounded-lg border border-[#E0D8CA] shadow-2xs">
               <span>{relatedReflections.length} connected {relatedReflections.length === 1 ? 'reflection' : 'reflections'}</span>
             </span>
           </div>
@@ -560,7 +560,7 @@ export const JournalEditor: React.FC<JournalEditorProps> = ({
                   key={relatedEntry.id}
                   id={`related-entry-card-${relatedEntry.id}`}
                   onClick={() => onSelectEntry && onSelectEntry(relatedEntry)}
-                  className="p-3.5 rounded-xl bg-[#FFFFFF] border border-[#E8E2D7] hover:border-[#D8CEBE] hover:bg-[#F8F5F0] transition-all cursor-pointer group flex flex-col justify-between shadow-2xs"
+                  className="p-4 rounded-xl bg-[#FFFFFF] border border-[#E0D8CA] hover:border-[#8C5E24] hover:bg-[#FDFBF7] transition-all cursor-pointer group flex flex-col justify-between shadow-2xs"
                   role="button"
                   tabIndex={0}
                   aria-label={`Open related reflection: ${relatedEntry.title || 'Untitled reflection'}`}
@@ -573,36 +573,36 @@ export const JournalEditor: React.FC<JournalEditorProps> = ({
                 >
                   <div>
                     <div className="flex items-start justify-between gap-1.5 mb-1.5">
-                      <h4 className="text-xs sm:text-sm font-serif font-bold text-[#1F1D1A] group-hover:text-[#8C6226] transition-colors line-clamp-1">
+                      <h4 className="text-sm sm:text-base font-serif font-bold text-[#1F1D1A] group-hover:text-[#593A12] transition-colors line-clamp-1">
                         {relatedEntry.title || 'Untitled Reflection'}
                       </h4>
-                      <ChevronRight className="w-4 h-4 text-[#9E9589] group-hover:text-[#8C6226] group-hover:translate-x-0.5 transition-all shrink-0 mt-0.5" />
+                      <ChevronRight className="w-4 h-4 text-[#8C5E24] group-hover:text-[#593A12] group-hover:translate-x-0.5 transition-all shrink-0 mt-0.5" />
                     </div>
 
-                    <div className="flex items-center gap-1.5 text-[11px] text-[#7C7469] mb-2 font-medium">
+                    <div className="flex items-center gap-1.5 text-xs sm:text-sm text-[#4D453B] mb-2 font-semibold">
                       <span className="flex items-center gap-1">
-                        <Calendar className="w-3 h-3 text-[#9E9589]" />
+                        <Calendar className="w-3.5 h-3.5 text-[#8C5E24]" />
                         {dateStr}
                       </span>
                       <span>•</span>
-                      <span className="text-[#8C6226] font-semibold bg-[#F5EFE6] px-1.5 py-0.2 rounded border border-[#E8DCB8]">
+                      <span className="text-[#593A12] font-bold bg-[#F5EFE6] px-2 py-0.5 rounded-md border border-[#DFCBA8]">
                         {matchPercent}% match
                       </span>
                     </div>
 
                     {snippet && (
-                      <p className="text-xs text-[#7C7469] line-clamp-2 leading-relaxed">
+                      <p className="text-xs sm:text-sm text-[#3D352E] line-clamp-2 leading-relaxed font-normal">
                         {snippet}
                       </p>
                     )}
                   </div>
 
                   {relatedEntry.tags && relatedEntry.tags.length > 0 && (
-                    <div className="flex flex-wrap items-center gap-1 mt-2.5 pt-2 border-t border-[#F2ECE4]">
+                    <div className="flex flex-wrap items-center gap-1 mt-2.5 pt-2 border-t border-[#EAE4DC]">
                       {relatedEntry.tags.slice(0, 2).map((tag) => (
                         <span
                           key={tag}
-                          className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-[#FAF8F5] text-[#7C7469] border border-[#E8E2D7]"
+                          className="text-xs font-bold px-2.5 py-0.5 rounded-full bg-[#F5EFE6] text-[#593A12] border border-[#DFCBA8]"
                         >
                           #{tag}
                         </span>
