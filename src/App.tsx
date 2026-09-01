@@ -77,15 +77,15 @@ export default function App() {
 
   if (authLoading) {
     return (
-      <div className="min-h-screen bg-[#FAF9F6] text-[#242220] flex flex-col items-center justify-center p-4">
-        <div className="w-10 h-10 border-3 border-[#638466]/20 border-t-[#638466] rounded-full animate-spin mb-4" />
-        <p className="text-sm font-semibold text-[#666057]">Initializing Sonderly Security Context...</p>
+      <div className="min-h-screen bg-[#FBF9F4] text-[#1F1D1A] flex flex-col items-center justify-center p-4">
+        <div className="w-10 h-10 border-3 border-[#B88746]/20 border-t-[#B88746] rounded-full animate-spin mb-4" />
+        <p className="text-sm font-semibold text-[#7C7469]">Initializing Sonderly Security Context...</p>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-[#FAF9F6] text-[#242220] flex flex-col font-sans antialiased selection:bg-[#638466] selection:text-white">
+    <div className="min-h-screen bg-[#FBF9F4] text-[#1F1D1A] flex flex-col font-sans antialiased selection:bg-[#B88746] selection:text-white">
       {/* Top Navigation */}
       <Navbar
         user={user}

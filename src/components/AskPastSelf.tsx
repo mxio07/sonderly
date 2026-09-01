@@ -1,18 +1,14 @@
 import React, { useState } from 'react';
 import { 
   Sparkles, 
-  HelpCircle, 
   Send, 
   Loader2, 
   BookOpen, 
   Calendar, 
-  MessageSquare, 
   ChevronRight, 
-  RotateCcw, 
   Copy, 
   Check, 
   AlertCircle,
-  Hash,
   Compass
 } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
@@ -43,11 +39,11 @@ interface QAResult {
 }
 
 const SUGGESTED_QUESTIONS = [
-  'What was I worried about last month?',
-  'Have I written about my friendships before?',
-  'What were some wins or moments of gratitude I recorded?',
-  'What recurring goals or habits have I mentioned?',
-  'How has my perspective on work or projects evolved?',
+  'What were my core strategic priorities last month?',
+  'Have I explored decision-making frameworks before?',
+  'What key realizations or breakthroughs did I document?',
+  'What recurring bottlenecks or cognitive biases have I noticed?',
+  'How has my perspective on work or long-term vision evolved?',
 ];
 
 export const AskPastSelf: React.FC<AskPastSelfProps> = ({
@@ -74,7 +70,7 @@ export const AskPastSelf: React.FC<AskPastSelfProps> = ({
 
     try {
       if (entries.length === 0) {
-        throw new Error('You do not have any saved journal reflections yet. Write your first reflection so your past self has memories to draw from!');
+        throw new Error('You do not have any saved reflections yet. Write your first reflection so your memory system has context to synthesize from!');
       }
 
       // 1. Generate Question Embedding via Server-Side Gemini endpoint
@@ -152,23 +148,23 @@ export const AskPastSelf: React.FC<AskPastSelfProps> = ({
   return (
     <div className="max-w-4xl mx-auto space-y-6">
       {/* Header Banner */}
-      <div className="bg-[#FFFFFF] border border-[#EDE8E1] rounded-2xl p-6 sm:p-8 shadow-xs">
+      <div className="bg-[#FFFFFF] border border-[#E8E2D7] rounded-2xl p-6 sm:p-8 shadow-xs">
         <div className="flex items-start justify-between gap-4">
           <div>
-            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-[#F1F6F1] text-[#466548] border border-[#DCE8DC] mb-3">
-              <Sparkles className="w-3.5 h-3.5 text-[#638466]" />
+            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-[#F5EFE6] text-[#8C6226] border border-[#E8DCB8] mb-3">
+              <Sparkles className="w-3.5 h-3.5 text-[#B88746]" />
               <span>Grounded RAG Reflection</span>
             </div>
-            <h2 className="text-xl sm:text-2xl font-bold tracking-tight text-[#242220]">
+            <h2 className="text-xl sm:text-2xl font-serif font-bold tracking-tight text-[#1F1D1A]">
               Ask Your Past Self
             </h2>
-            <p className="text-sm text-[#666057] mt-1.5 leading-relaxed max-w-2xl">
-              Ask questions about your personal journaling history. Sonderly uses vector semantic search over your private, user-isolated entries and synthesizes thoughtful answers strictly grounded in what you actually wrote.
+            <p className="text-sm text-[#7C7469] mt-1.5 leading-relaxed max-w-2xl">
+              Query your personal reflection history. Sonderly uses vector semantic search over your private, user-isolated thoughts and synthesizes clear answers strictly grounded in what you actually wrote.
             </p>
           </div>
 
-          <div className="hidden sm:flex flex-col items-end text-xs text-[#918B82]">
-            <span className="font-semibold text-[#466548] font-mono">
+          <div className="hidden sm:flex flex-col items-end text-xs text-[#9E9589]">
+            <span className="font-semibold text-[#8C6226] font-mono">
               {entriesWithEmbeddings.length} of {entries.length} indexed
             </span>
             <span>Zero Cross-User Leakage</span>
@@ -191,13 +187,13 @@ export const AskPastSelf: React.FC<AskPastSelfProps> = ({
               onChange={(e) => setQuestion(e.target.value)}
               placeholder="Ask anything about your past reflections... (e.g. 'What was I feeling about my goals in June?')"
               disabled={isLoading}
-              className="w-full bg-[#FAF9F6] border border-[#EDE8E1] focus:border-[#638466] rounded-xl pl-4 pr-28 py-3 text-sm sm:text-base text-[#242220] placeholder-[#918B82] focus:outline-none focus:ring-2 focus:ring-[#638466]/20 transition-all"
+              className="w-full bg-[#FAF8F5] border border-[#E8E2D7] focus:border-[#B88746] rounded-xl pl-4 pr-28 py-3 text-sm sm:text-base text-[#1F1D1A] placeholder-[#9E9589] focus:outline-none focus:ring-2 focus:ring-[#B88746]/20 transition-all"
             />
             <button
               id="btn-submit-ask-past-self"
               type="submit"
               disabled={isLoading || !question.trim()}
-              className="absolute right-2 top-2 bottom-2 px-4 bg-[#638466] hover:bg-[#527055] disabled:opacity-40 disabled:cursor-not-allowed text-white rounded-lg text-xs sm:text-sm font-semibold transition-all shadow-xs flex items-center gap-1.5 cursor-pointer"
+              className="absolute right-2 top-2 bottom-2 px-4 bg-[#B88746] hover:bg-[#A37438] disabled:opacity-40 disabled:cursor-not-allowed text-white rounded-lg text-xs sm:text-sm font-semibold transition-all shadow-xs flex items-center gap-1.5 cursor-pointer"
             >
               {isLoading ? (
                 <>
@@ -215,8 +211,8 @@ export const AskPastSelf: React.FC<AskPastSelfProps> = ({
 
           {/* Quick Prompts Chips */}
           <div className="flex items-center gap-1.5 flex-wrap pt-1">
-            <span className="text-[11px] text-[#918B82] font-medium flex items-center gap-1 mr-1">
-              <Compass className="w-3 h-3 text-[#638466]" />
+            <span className="text-[11px] text-[#9E9589] font-medium flex items-center gap-1 mr-1">
+              <Compass className="w-3 h-3 text-[#B88746]" />
               <span>Try asking:</span>
             </span>
             {SUGGESTED_QUESTIONS.map((promptText) => (
@@ -228,9 +224,9 @@ export const AskPastSelf: React.FC<AskPastSelfProps> = ({
                   handleAskQuestion(promptText);
                 }}
                 disabled={isLoading}
-                className="text-[11px] px-2.5 py-1 rounded-lg bg-[#F7F4EE] hover:bg-[#EDE8E1] text-[#666057] hover:text-[#242220] border border-[#EAE4DC] transition-colors cursor-pointer text-left"
+                className="text-[11px] px-2.5 py-1 rounded-lg bg-[#F8F5F0] hover:bg-[#EDE8E1] text-[#7C7469] hover:text-[#1F1D1A] border border-[#EAE4DC] transition-colors cursor-pointer text-left font-medium"
               >
-                "{promptText}"
+                &ldquo;{promptText}&rdquo;
               </button>
             ))}
           </div>
@@ -238,11 +234,11 @@ export const AskPastSelf: React.FC<AskPastSelfProps> = ({
 
         {/* Error Alert */}
         {errorMessage && (
-          <div className="mt-4 p-3 bg-[#FDF4F0] border border-[#FADCD5] rounded-xl flex items-start gap-2.5 text-xs text-[#B6634C]">
+          <div className="mt-4 p-3 bg-[#FDF3F0] border border-[#FADCD5] rounded-xl flex items-start gap-2.5 text-xs text-[#9E4733]">
             <AlertCircle className="w-4 h-4 shrink-0 text-[#C46A52] mt-0.5" />
             <div className="flex-1">
               <p className="font-semibold">Unable to complete reflection</p>
-              <p className="mt-0.5 text-[#A5553E]">{errorMessage}</p>
+              <p className="mt-0.5 text-[#9E4733]">{errorMessage}</p>
             </div>
           </div>
         )}
@@ -250,12 +246,12 @@ export const AskPastSelf: React.FC<AskPastSelfProps> = ({
 
       {/* Loading Placeholder */}
       {isLoading && (
-        <div className="bg-[#FFFFFF] border border-[#DCE8DC] rounded-2xl p-8 text-center space-y-3 shadow-xs animate-pulse">
-          <div className="w-10 h-10 rounded-full bg-[#F1F6F1] flex items-center justify-center mx-auto text-[#638466]">
+        <div className="bg-[#FFFFFF] border border-[#E8DCB8] rounded-2xl p-8 text-center space-y-3 shadow-xs animate-pulse">
+          <div className="w-10 h-10 rounded-full bg-[#F5EFE6] flex items-center justify-center mx-auto text-[#B88746]">
             <Loader2 className="w-5 h-5 animate-spin" />
           </div>
-          <h3 className="text-base font-bold text-[#242220]">Consulting your past reflections...</h3>
-          <p className="text-xs text-[#666057] max-w-md mx-auto">
+          <h3 className="text-base font-serif font-bold text-[#1F1D1A]">Consulting your past reflections...</h3>
+          <p className="text-xs text-[#7C7469] max-w-md mx-auto">
             Generating semantic query vector, retrieving matching entry excerpts via cosine similarity, and synthesizing a grounded answer with Gemini.
           </p>
         </div>
@@ -263,20 +259,20 @@ export const AskPastSelf: React.FC<AskPastSelfProps> = ({
 
       {/* Empty State when no Q&A yet */}
       {qaHistory.length === 0 && !isLoading && (
-        <div className="bg-[#FFFFFF] border border-[#EDE8E1] rounded-2xl p-10 text-center space-y-4 shadow-xs">
-          <div className="w-12 h-12 rounded-2xl bg-[#F7F4EE] border border-[#EDE8E1] flex items-center justify-center mx-auto text-[#638466]">
+        <div className="bg-[#FFFFFF] border border-[#E8E2D7] rounded-2xl p-10 text-center space-y-4 shadow-xs">
+          <div className="w-12 h-12 rounded-2xl bg-[#FAF8F5] border border-[#E8E2D7] flex items-center justify-center mx-auto text-[#B88746]">
             <BookOpen className="w-6 h-6" />
           </div>
           <div>
-            <h3 className="text-base font-bold text-[#242220]">No conversations with your past self yet</h3>
-            <p className="text-xs text-[#666057] mt-1 max-w-md mx-auto leading-relaxed">
-              Ask a question above to explore themes, emotional shifts, or memories across your journal. Sonderly connects the dots across your entries while never inventing anything you didn't write.
+            <h3 className="text-base font-serif font-bold text-[#1F1D1A]">No conversations with your past self yet</h3>
+            <p className="text-xs text-[#7C7469] mt-1 max-w-md mx-auto leading-relaxed">
+              Ask a question above to explore patterns, strategic shifts, or core decisions across your reflections. Sonderly connects the dots while remaining strictly grounded in what you actually wrote.
             </p>
           </div>
           {entries.length === 0 && (
             <button
               onClick={onNavigateToWrite}
-              className="px-4 py-2 bg-[#638466] hover:bg-[#527055] text-white rounded-xl text-xs font-semibold transition-all shadow-xs cursor-pointer inline-flex items-center gap-1.5"
+              className="px-4 py-2 bg-[#B88746] hover:bg-[#A37438] text-white rounded-xl text-xs font-semibold transition-all shadow-xs cursor-pointer inline-flex items-center gap-1.5"
             >
               <span>Write Your First Reflection</span>
               <ChevronRight className="w-3.5 h-3.5" />
@@ -291,24 +287,24 @@ export const AskPastSelf: React.FC<AskPastSelfProps> = ({
           <div
             key={qa.id}
             id={`qa-card-${qa.id}`}
-            className="bg-[#FFFFFF] border border-[#EDE8E1] rounded-2xl p-6 sm:p-8 shadow-xs space-y-5"
+            className="bg-[#FFFFFF] border border-[#E8E2D7] rounded-2xl p-6 sm:p-8 shadow-xs space-y-5"
           >
             {/* Question Header */}
-            <div className="flex items-start justify-between gap-4 pb-4 border-b border-[#EDE8E1]">
+            <div className="flex items-start justify-between gap-4 pb-4 border-b border-[#EAE4DC]">
               <div className="flex items-start gap-3">
-                <div className="w-7 h-7 rounded-lg bg-[#242220] text-white flex items-center justify-center font-bold text-xs shrink-0 mt-0.5">
+                <div className="w-7 h-7 rounded-lg bg-[#1F1D1A] text-[#E0B574] flex items-center justify-center font-bold text-xs shrink-0 mt-0.5">
                   Q
                 </div>
                 <div>
-                  <h3 className="text-base sm:text-lg font-bold text-[#242220]">
-                    "{qa.question}"
+                  <h3 className="text-base sm:text-lg font-serif font-bold text-[#1F1D1A]">
+                    &ldquo;{qa.question}&rdquo;
                   </h3>
-                  <div className="flex items-center gap-2 text-[11px] text-[#918B82] mt-1 font-mono">
+                  <div className="flex items-center gap-2 text-[11px] text-[#9E9589] mt-1 font-mono">
                     <span>{new Date(qa.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
                     <span>•</span>
                     <span>Model: {qa.modelUsed}</span>
                     <span>•</span>
-                    <span className="text-[#466548]">{qa.retrievedSources.length} sources referenced</span>
+                    <span className="text-[#8C6226]">{qa.retrievedSources.length} sources referenced</span>
                   </div>
                 </div>
               </div>
@@ -316,24 +312,24 @@ export const AskPastSelf: React.FC<AskPastSelfProps> = ({
               <button
                 onClick={() => handleCopy(qa.id, qa.answer)}
                 title="Copy Answer"
-                className="p-2 text-[#918B82] hover:text-[#242220] hover:bg-[#F7F4EE] rounded-lg transition-colors cursor-pointer"
+                className="p-2 text-[#9E9589] hover:text-[#1F1D1A] hover:bg-[#FAF8F5] rounded-lg transition-colors cursor-pointer"
               >
-                {copiedId === qa.id ? <Check className="w-4 h-4 text-[#638466]" /> : <Copy className="w-4 h-4" />}
+                {copiedId === qa.id ? <Check className="w-4 h-4 text-[#B88746]" /> : <Copy className="w-4 h-4" />}
               </button>
             </div>
 
             {/* Grounded AI Answer */}
             <div className="flex items-start gap-3">
-              <div className="w-7 h-7 rounded-lg bg-[#F1F6F1] border border-[#DCE8DC] text-[#466548] flex items-center justify-center font-bold text-xs shrink-0 mt-0.5">
-                <Sparkles className="w-4 h-4 text-[#638466]" />
+              <div className="w-7 h-7 rounded-lg bg-[#F5EFE6] border border-[#E8DCB8] text-[#8C6226] flex items-center justify-center font-bold text-xs shrink-0 mt-0.5">
+                <Sparkles className="w-4 h-4 text-[#B88746]" />
               </div>
-              <div className="flex-1 text-sm sm:text-base text-[#242220] leading-relaxed space-y-3 prose prose-stone max-w-none">
+              <div className="flex-1 text-sm sm:text-base text-[#1F1D1A] leading-relaxed space-y-3 prose prose-stone max-w-none">
                 <ReactMarkdown
                   components={{
-                    p: ({ node, ...props }) => <p className="mb-2 last:mb-0 text-[#242220] leading-relaxed" {...props} />,
-                    strong: ({ node, ...props }) => <strong className="font-bold text-[#242220] bg-[#F7F4EE] px-1 py-0.5 rounded" {...props} />,
-                    ul: ({ node, ...props }) => <ul className="list-disc pl-5 space-y-1 mb-3 text-[#423E39]" {...props} />,
-                    li: ({ node, ...props }) => <li className="text-[#423E39]" {...props} />,
+                    p: ({ node, ...props }) => <p className="mb-2 last:mb-0 text-[#1F1D1A] leading-relaxed" {...props} />,
+                    strong: ({ node, ...props }) => <strong className="font-bold text-[#1F1D1A] bg-[#F5EFE6] px-1 py-0.5 rounded border border-[#E8DCB8]" {...props} />,
+                    ul: ({ node, ...props }) => <ul className="list-disc pl-5 space-y-1 mb-3 text-[#423A31]" {...props} />,
+                    li: ({ node, ...props }) => <li className="text-[#423A31]" {...props} />,
                   }}
                 >
                   {qa.answer}
@@ -343,13 +339,13 @@ export const AskPastSelf: React.FC<AskPastSelfProps> = ({
 
             {/* Retrieved Source Excerpts Section */}
             {qa.retrievedSources.length > 0 && (
-              <div className="pt-4 border-t border-[#EDE8E1] space-y-2.5">
-                <div className="flex items-center justify-between text-xs text-[#666057] font-medium">
+              <div className="pt-4 border-t border-[#EAE4DC] space-y-2.5">
+                <div className="flex items-center justify-between text-xs text-[#7C7469] font-medium">
                   <span className="flex items-center gap-1.5">
-                    <BookOpen className="w-3.5 h-3.5 text-[#638466]" />
+                    <BookOpen className="w-3.5 h-3.5 text-[#B88746]" />
                     <span>Retrieved Entries From Your Private Journal</span>
                   </span>
-                  <span className="text-[11px] text-[#918B82]">Click entry to view or edit</span>
+                  <span className="text-[11px] text-[#9E9589]">Click entry to view or edit</span>
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
@@ -360,28 +356,28 @@ export const AskPastSelf: React.FC<AskPastSelfProps> = ({
                         key={entry.id}
                         id={`source-card-${qa.id}-${entry.id}`}
                         onClick={() => onSelectEntry(entry)}
-                        className="p-3 bg-[#FAF9F6] hover:bg-[#F7F4EE] border border-[#EDE8E1] hover:border-[#DCE8DC] rounded-xl transition-all cursor-pointer group flex flex-col justify-between text-left"
+                        className="p-3 bg-[#FAF8F5] hover:bg-[#F8F5F0] border border-[#E8E2D7] hover:border-[#E8DCB8] rounded-xl transition-all cursor-pointer group flex flex-col justify-between text-left"
                       >
                         <div>
                           <div className="flex items-center justify-between gap-2 mb-1">
-                            <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-[#242220] text-white font-mono">
+                            <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-[#1F1D1A] text-white font-mono">
                               #{idx + 1}
                             </span>
                             {similarity > 0 && (
-                              <span className="text-[10px] font-semibold text-[#466548] bg-[#F1F6F1] px-1.5 py-0.5 rounded border border-[#DCE8DC] font-mono">
+                              <span className="text-[10px] font-semibold text-[#8C6226] bg-[#F5EFE6] px-1.5 py-0.5 rounded border border-[#E8DCB8] font-mono">
                                 {similarityPct}% match
                               </span>
                             )}
                           </div>
-                          <h4 className="text-xs font-bold text-[#242220] group-hover:text-[#638466] transition-colors truncate">
+                          <h4 className="text-xs font-serif font-bold text-[#1F1D1A] group-hover:text-[#8C6226] transition-colors truncate">
                             {entry.title || 'Untitled Reflection'}
                           </h4>
-                          <p className="text-[11px] text-[#666057] line-clamp-2 mt-1 leading-snug">
+                          <p className="text-[11px] text-[#7C7469] line-clamp-2 mt-1 leading-snug">
                             {entry.content}
                           </p>
                         </div>
 
-                        <div className="flex items-center justify-between text-[10px] text-[#918B82] mt-2 pt-2 border-t border-[#EDE8E1]">
+                        <div className="flex items-center justify-between text-[10px] text-[#9E9589] mt-2 pt-2 border-t border-[#EAE4DC]">
                           <span className="flex items-center gap-1">
                             <Calendar className="w-3 h-3" />
                             {new Date(entry.createdAt).toLocaleDateString(undefined, {
@@ -390,7 +386,7 @@ export const AskPastSelf: React.FC<AskPastSelfProps> = ({
                               year: 'numeric',
                             })}
                           </span>
-                          <span className="flex items-center gap-0.5 text-[#638466] font-semibold group-hover:underline">
+                          <span className="flex items-center gap-0.5 text-[#8C6226] font-semibold group-hover:underline">
                             <span>Open</span>
                             <ChevronRight className="w-3 h-3" />
                           </span>

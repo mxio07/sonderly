@@ -277,14 +277,14 @@ export const Dashboard: React.FC<DashboardProps> = ({
       
       {/* Global Error Banner */}
       {firestoreError && (
-        <div className="mb-6 p-4 rounded-xl bg-[#FDF4F0] border border-[#FADCD5] text-[#B6634C] text-xs flex items-center justify-between shadow-xs">
+        <div className="mb-6 p-4 rounded-xl bg-[#FDF3F0] border border-[#FADCD5] text-[#9E4733] text-xs flex items-center justify-between shadow-xs">
           <div className="flex items-center gap-2">
             <AlertCircle className="w-4 h-4 text-[#C46A52] shrink-0" />
             <span>{firestoreError}</span>
           </div>
           <button
             onClick={() => window.location.reload()}
-            className="px-3 py-1 bg-[#C46A52] hover:bg-[#B05B44] text-white rounded-lg transition-colors cursor-pointer font-semibold"
+            className="px-3 py-1 bg-[#9E4733] hover:bg-[#853B2A] text-white rounded-lg transition-colors cursor-pointer font-semibold"
           >
             Reload
           </button>
