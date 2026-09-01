@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { auth, signInWithGoogle, logOut, onAuthStateChanged, syncUserProfile } from './lib/firebase';
 import { UserProfile } from './types';
-import { Navbar } from './components/Navbar';
+import { Navbar, AppTab } from './components/Navbar';
 import { LandingPage } from './components/LandingPage';
 import { Dashboard } from './components/Dashboard';
 import { ThreatModelModal } from './components/ThreatModelModal';
@@ -12,7 +12,7 @@ export default function App() {
   const [authLoading, setAuthLoading] = useState(true);
   const [actionLoading, setActionLoading] = useState(false);
   const [authError, setAuthError] = useState<string | null>(null);
-  const [activeTab, setActiveTab] = useState<'write' | 'history' | 'ask'>('write');
+  const [activeTab, setActiveTab] = useState<AppTab>('home');
   const [entriesCount, setEntriesCount] = useState(0);
 
   // Modals state
@@ -52,6 +52,7 @@ export default function App() {
         photoURL: fbUser.photoURL,
       };
       setUser(profile);
+      setActiveTab('home');
       await syncUserProfile(fbUser);
     } catch (err: any) {
       console.error('Sign-in error:', err);
@@ -69,7 +70,7 @@ export default function App() {
     try {
       await logOut();
       setUser(null);
-      setActiveTab('write');
+      setActiveTab('home');
     } catch (err: any) {
       console.error('Sign-out error:', err);
     }
@@ -78,14 +79,14 @@ export default function App() {
   if (authLoading) {
     return (
       <div className="min-h-screen bg-[#FBF9F4] text-[#1F1D1A] flex flex-col items-center justify-center p-4">
-        <div className="w-10 h-10 border-3 border-[#B88746]/20 border-t-[#B88746] rounded-full animate-spin mb-4" />
-        <p className="text-sm font-semibold text-[#7C7469]">Initializing Sonderly Security Context...</p>
+        <div className="w-10 h-10 border-3 border-[#8C5E24]/20 border-t-[#8C5E24] rounded-full animate-spin mb-4" />
+        <p className="text-sm font-semibold text-[#5C5346]">Initializing Sonderly Security Context...</p>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-[#FBF9F4] text-[#1F1D1A] flex flex-col font-sans antialiased selection:bg-[#B88746] selection:text-white">
+    <div className="min-h-screen bg-[#FBF9F4] text-[#1F1D1A] flex flex-col font-sans antialiased selection:bg-[#8C5E24] selection:text-white">
       {/* Top Navigation */}
       <Navbar
         user={user}

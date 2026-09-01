@@ -167,6 +167,21 @@ const TEST_CASES: TestCase[] = [
     ],
     expectedResult: 'Cosine similarity is computed over stored embedding vectors; only the current user’s own related reflections meeting relevance thresholds (>=65%) are shown; clicking immediately opens the connected entry, and unmeaningful matches are suppressed.',
   },
+  {
+    id: 'TC-12',
+    category: 'Navigation & Mode Architecture',
+    name: 'Home Mode Choice Screen & Seamless Mode Routing',
+    precondition: 'User successfully signs in with Google Auth.',
+    steps: [
+      'Observe the post-sign-in landing view: verify the user is presented with the welcoming Home screen ("How would you like to think today?") instead of being abruptly dropped into the raw editor.',
+      'Verify the two prominent choice cards are clearly rendered with matching gold/cream/charcoal styling: "Reflect & Synthesize" (#card-mode-write) and "Talk it Through" (#card-mode-dialogue).',
+      'Click the "Reflect & Synthesize" card: verify it immediately routes into the full Reflection Workspace with the journal editor, AI synthesis, emotional themes, and literature deck.',
+      'Click the "Home" button (#btn-return-home or #nav-tab-home) in the workspace breadcrumb or top navigation: verify it returns to the choice screen.',
+      'Click the "Talk it Through" card: verify it opens the focused Socratic dialogue conversation interface powered by Gemini.',
+      'Verify top navigation tabs (Past Entries, Ask Past Self, Security Specs) remain accessible across all screens.',
+    ],
+    expectedResult: 'The Home choice screen acts as a clean, welcoming router into existing, fully-functional workspaces with effortless return-to-home navigation and zero state or data loss.',
+  },
 ];
 
 export const TestWalkthroughModal: React.FC<TestWalkthroughModalProps> = ({ isOpen, onClose }) => {

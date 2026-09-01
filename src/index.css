@@ -59,12 +59,81 @@
   }
 }
 
+/* Gentle continuous horizontal flowing ribbon drift (calm, slow, organic) */
+@keyframes ribbonDrift1 {
+  0% {
+    transform: translate3d(0, 0, 0);
+  }
+  50% {
+    transform: translate3d(-40px, -5px, 0);
+  }
+  100% {
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+@keyframes ribbonDrift2 {
+  0% {
+    transform: translate3d(0, 0, 0);
+  }
+  50% {
+    transform: translate3d(50px, 6px, 0);
+  }
+  100% {
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+@keyframes ribbonDrift3 {
+  0% {
+    transform: translate3d(0, 0, 0);
+  }
+  50% {
+    transform: translate3d(-55px, 7px, 0);
+  }
+  100% {
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+@keyframes ribbonDrift4 {
+  0% {
+    transform: translate3d(0, 0, 0);
+  }
+  50% {
+    transform: translate3d(35px, -6px, 0);
+  }
+  100% {
+    transform: translate3d(0, 0, 0);
+  }
+}
+
 .animate-glow-pulse {
   animation: ambientGlowPulse 8s ease-in-out infinite;
 }
 
 .animate-subtle-float {
   animation: subtleFloat 6s ease-in-out infinite;
+}
+
+.animate-ribbon-drift-1 {
+  animation: ribbonDrift1 26s ease-in-out infinite;
+  will-change: transform;
+}
+
+.animate-ribbon-drift-2 {
+  animation: ribbonDrift2 32s ease-in-out infinite;
+  will-change: transform;
+}
+
+.animate-ribbon-drift-3 {
+  animation: ribbonDrift3 28s ease-in-out infinite;
+  will-change: transform;
+}
+
+.animate-ribbon-drift-4 {
+  animation: ribbonDrift4 36s ease-in-out infinite;
+  will-change: transform;
 }
 
 

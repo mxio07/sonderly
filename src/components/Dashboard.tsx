@@ -4,14 +4,26 @@ import { JournalEditor } from './JournalEditor';
 import { GeminiConversation } from './GeminiConversation';
 import { EntryHistory } from './EntryHistory';
 import { AskPastSelf } from './AskPastSelf';
+import { ModeChoiceHome } from './ModeChoiceHome';
+import { AppTab } from './Navbar';
 import { saveJournalEntry, deleteJournalEntry, subscribeToUserEntries } from '../lib/firebase';
 import { requestGeminiReflection, requestGeminiSummary, requestGeminiTitle, requestGeminiEmbedding } from '../lib/geminiClient';
-import { AlertCircle, RefreshCw } from 'lucide-react';
+import { 
+  AlertCircle, 
+  RefreshCw, 
+  ArrowLeft, 
+  Home, 
+  PenTool, 
+  MessageSquare,
+  Sparkles,
+  Layers,
+  Columns
+} from 'lucide-react';
 
 interface DashboardProps {
   user: UserProfile;
-  activeTab: 'write' | 'history' | 'ask';
-  setActiveTab: (tab: 'write' | 'history' | 'ask') => void;
+  activeTab: AppTab;
+  setActiveTab: (tab: AppTab) => void;
   onEntriesCountChange: (count: number) => void;
 }
 
@@ -272,6 +284,37 @@ export const Dashboard: React.FC<DashboardProps> = ({
     setActiveTab('write');
   };
 
+  if (activeTab === 'home') {
+    return (
+      <div>
+        {firestoreError && (
+          <div className="max-w-5xl mx-auto px-4 pt-4">
+            <div className="p-4 rounded-xl bg-[#FDF3F0] border border-[#FADCD5] text-[#9E4733] text-xs flex items-center justify-between shadow-xs">
+              <div className="flex items-center gap-2">
+                <AlertCircle className="w-4 h-4 text-[#C46A52] shrink-0" />
+                <span>{firestoreError}</span>
+              </div>
+              <button
+                onClick={() => window.location.reload()}
+                className="px-3 py-1 bg-[#9E4733] hover:bg-[#853B2A] text-white rounded-lg transition-colors cursor-pointer font-semibold"
+              >
+                Reload
+              </button>
+            </div>
+          </div>
+        )}
+
+        <ModeChoiceHome
+          user={user}
+          entries={entries}
+          onSelectMode={(mode) => setActiveTab(mode)}
+          onNavigateToHistory={() => setActiveTab('history')}
+          onNavigateToAsk={() => setActiveTab('ask')}
+        />
+      </div>
+    );
+  }
+
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
       
@@ -291,27 +334,128 @@ export const Dashboard: React.FC<DashboardProps> = ({
         </div>
       )}
 
-      {/* Main Content Tabs */}
+      {/* View 2: Reflect & Synthesize Mode (Full Workspace with Editor & Companion) */}
       {activeTab === 'write' && (
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
-          {/* Left / Top: Journal Editor */}
-          <div className="lg:col-span-6 xl:col-span-7">
-            <JournalEditor
-              entry={activeEntry}
-              allEntries={entries}
-              onSelectEntry={handleSelectEntry}
-              onUpdateEntry={handleUpdateEntry}
-              onSaveEntry={handleSaveEntry}
-              onGenerateSummary={handleGenerateSummary}
-              isSaving={isSaving}
-              isSummarizing={isSummarizing}
-              saveStatus={saveStatus}
-              errorMessage={errorMessage}
-            />
+        <div className="space-y-4">
+          
+          {/* Mode Navigation & Breadcrumb Header */}
+          <div className="flex flex-wrap items-center justify-between gap-3 pb-3 border-b border-[#EAE4DC]">
+            <div className="flex items-center gap-2">
+              <button
+                id="btn-return-home"
+                onClick={() => setActiveTab('home')}
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[#FFFFFF] hover:bg-[#F5EFE6] text-[#3D352E] hover:text-[#1F1D1A] font-semibold text-xs border border-[#E0D8CA] transition-colors shadow-2xs cursor-pointer"
+                title="Return to Mode Choice Screen"
+              >
+                <Home className="w-3.5 h-3.5 text-[#8C5E24]" />
+                <span>Home</span>
+              </button>
+
+              <span className="text-[#D8CEBE]">/</span>
+
+              <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-[#F5EFE6] text-[#6B4716] text-xs font-semibold border border-[#DFCBA8]">
+                <PenTool className="w-3.5 h-3.5 text-[#8C5E24]" />
+                <span>Mode: Reflect &amp; Synthesize</span>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-2">
+              <button
+                onClick={() => setActiveTab('dialogue')}
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[#FAF8F5] hover:bg-[#F5EFE6] text-[#4D453B] hover:text-[#1F1D1A] font-medium text-xs border border-[#E0D8CA] transition-colors cursor-pointer"
+                title="Switch to Talk it Through mode"
+              >
+                <MessageSquare className="w-3.5 h-3.5 text-[#8C5E24]" />
+                <span>Switch to Talk it Through &rarr;</span>
+              </button>
+            </div>
           </div>
 
-          {/* Right / Bottom: Gemini Multi-Turn Conversation */}
-          <div className="lg:col-span-6 xl:col-span-5">
+          {/* Existing Editor & Companion Grid */}
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+            {/* Left: Journal Editor */}
+            <div className="lg:col-span-6 xl:col-span-7">
+              <JournalEditor
+                entry={activeEntry}
+                allEntries={entries}
+                onSelectEntry={handleSelectEntry}
+                onUpdateEntry={handleUpdateEntry}
+                onSaveEntry={handleSaveEntry}
+                onGenerateSummary={handleGenerateSummary}
+                isSaving={isSaving}
+                isSummarizing={isSummarizing}
+                saveStatus={saveStatus}
+                errorMessage={errorMessage}
+              />
+            </div>
+
+            {/* Right: Gemini Multi-Turn Conversation */}
+            <div className="lg:col-span-6 xl:col-span-5">
+              <GeminiConversation
+                messages={activeEntry.messages || []}
+                onSendMessage={handleSendMessage}
+                onClearChat={handleClearChat}
+                isLoading={isAiLoading}
+                entryContent={activeEntry.content}
+                errorMessage={errorMessage}
+              />
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* View 3: Talk it Through Mode (Focused Socratic Dialogue Interface) */}
+      {activeTab === 'dialogue' && (
+        <div className="max-w-4xl mx-auto space-y-4">
+          
+          {/* Mode Navigation & Breadcrumb Header */}
+          <div className="flex flex-wrap items-center justify-between gap-3 pb-3 border-b border-[#EAE4DC]">
+            <div className="flex items-center gap-2">
+              <button
+                id="btn-return-home-dialogue"
+                onClick={() => setActiveTab('home')}
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[#FFFFFF] hover:bg-[#F5EFE6] text-[#3D352E] hover:text-[#1F1D1A] font-semibold text-xs border border-[#E0D8CA] transition-colors shadow-2xs cursor-pointer"
+                title="Return to Mode Choice Screen"
+              >
+                <Home className="w-3.5 h-3.5 text-[#8C5E24]" />
+                <span>Home</span>
+              </button>
+
+              <span className="text-[#D8CEBE]">/</span>
+
+              <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-[#FAF8F5] text-[#6B4716] text-xs font-semibold border border-[#DFCBA8]">
+                <MessageSquare className="w-3.5 h-3.5 text-[#8C5E24]" />
+                <span>Mode: Talk it Through</span>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-2">
+              <button
+                onClick={() => setActiveTab('write')}
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[#FAF8F5] hover:bg-[#F5EFE6] text-[#4D453B] hover:text-[#1F1D1A] font-medium text-xs border border-[#E0D8CA] transition-colors cursor-pointer"
+                title="Switch to Reflect & Synthesize mode"
+              >
+                <PenTool className="w-3.5 h-3.5 text-[#8C5E24]" />
+                <span>Open in Split Workspace &rarr;</span>
+              </button>
+            </div>
+          </div>
+
+          {/* Focused Gemini Socratic Dialogue Component */}
+          <div className="rounded-2xl bg-[#FFFFFF] border border-[#E0D8CA] shadow-sm p-4 sm:p-6">
+            <div className="mb-4 pb-4 border-b border-[#EAE4DC] flex items-center justify-between">
+              <div>
+                <h3 className="text-lg font-serif font-bold text-[#1F1D1A]">Socratic Inquiry &amp; Thinking Dialogue</h3>
+                <p className="text-xs text-[#5C5346] font-medium mt-0.5">
+                  Untangle problems, challenge assumptions, and explore possibilities in real-time.
+                </p>
+              </div>
+              <span className="hidden sm:inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-mono font-semibold bg-[#F5EFE6] text-[#6B4716] border border-[#DFCBA8]">
+                <Sparkles className="w-3 h-3 text-[#8C5E24]" />
+                Gemini Multi-Turn
+              </span>
+            </div>
+
             <GeminiConversation
               messages={activeEntry.messages || []}
               onSendMessage={handleSendMessage}
@@ -324,9 +468,21 @@ export const Dashboard: React.FC<DashboardProps> = ({
         </div>
       )}
 
+      {/* View 4: Past Entries History */}
       {activeTab === 'history' && (
-        /* History Tab */
-        <div className="max-w-4xl mx-auto">
+        <div className="max-w-4xl mx-auto space-y-4">
+          <div className="flex items-center gap-2 pb-2 border-b border-[#EAE4DC]">
+            <button
+              onClick={() => setActiveTab('home')}
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[#FFFFFF] hover:bg-[#F5EFE6] text-[#3D352E] hover:text-[#1F1D1A] font-semibold text-xs border border-[#E0D8CA] transition-colors shadow-2xs cursor-pointer"
+            >
+              <Home className="w-3.5 h-3.5 text-[#8C5E24]" />
+              <span>Home</span>
+            </button>
+            <span className="text-[#D8CEBE]">/</span>
+            <span className="text-xs font-semibold text-[#6B4716]">Past Entries Vault</span>
+          </div>
+
           <EntryHistory
             entries={entries}
             activeEntryId={activeEntry.id}
@@ -338,9 +494,21 @@ export const Dashboard: React.FC<DashboardProps> = ({
         </div>
       )}
 
+      {/* View 5: Ask Your Past Self (RAG) */}
       {activeTab === 'ask' && (
-        /* Ask Your Past Self (RAG) Tab */
-        <div className="max-w-4xl mx-auto">
+        <div className="max-w-4xl mx-auto space-y-4">
+          <div className="flex items-center gap-2 pb-2 border-b border-[#EAE4DC]">
+            <button
+              onClick={() => setActiveTab('home')}
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[#FFFFFF] hover:bg-[#F5EFE6] text-[#3D352E] hover:text-[#1F1D1A] font-semibold text-xs border border-[#E0D8CA] transition-colors shadow-2xs cursor-pointer"
+            >
+              <Home className="w-3.5 h-3.5 text-[#8C5E24]" />
+              <span>Home</span>
+            </button>
+            <span className="text-[#D8CEBE]">/</span>
+            <span className="text-xs font-semibold text-[#6B4716]">Ask Your Past Self</span>
+          </div>
+
           <AskPastSelf
             entries={entries}
             onSelectEntry={handleSelectEntry}
