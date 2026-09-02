@@ -17,6 +17,7 @@ import {
   requestGeminiEmbedding, 
   computeCosineSimilarity, 
   requestGeminiAskPastSelf,
+  requestGeminiAskPastSelfStream,
   ContextEntryPayload 
 } from '../lib/geminiClient';
 
@@ -36,6 +37,7 @@ interface QAResult {
     entry: JournalEntry;
     similarity: number;
   }>;
+  isStreaming?: boolean;
 }
 
 const SUGGESTED_QUESTIONS = [
@@ -117,20 +119,58 @@ export const AskPastSelf: React.FC<AskPastSelfProps> = ({
         similarity,
       }));
 
-      // 4. Invoke Server-Side Grounded RAG Endpoint
-      const response = await requestGeminiAskPastSelf(q, contextPayloads);
-
+      // 4. Create new QA entry immediately so it displays in-place with its retrieved sources
+      const currentQaId = `qa_${Date.now()}`;
       const newQA: QAResult = {
-        id: `qa_${Date.now()}`,
+        id: currentQaId,
         question: q,
-        answer: response.answer,
-        modelUsed: response.modelUsed,
+        answer: '',
+        modelUsed: 'gemini-3.6-flash',
         timestamp: Date.now(),
         retrievedSources: retrievedItems,
+        isStreaming: true,
       };
 
       setQaHistory((prev) => [newQA, ...prev]);
       setQuestion('');
+
+      // 5. Invoke Server-Side Grounded RAG Streaming Endpoint
+      await requestGeminiAskPastSelfStream(q, contextPayloads, {
+        onStart: (meta) => {
+          setQaHistory((prev) =>
+            prev.map((item) =>
+              item.id === currentQaId ? { ...item, modelUsed: meta.modelUsed } : item
+            )
+          );
+        },
+        onChunk: (chunkText) => {
+          setQaHistory((prev) =>
+            prev.map((item) =>
+              item.id === currentQaId ? { ...item, answer: item.answer + chunkText } : item
+            )
+          );
+        },
+        onDone: (meta) => {
+          setQaHistory((prev) =>
+            prev.map((item) =>
+              item.id === currentQaId
+                ? { ...item, modelUsed: meta.modelUsed, isStreaming: false }
+                : item
+            )
+          );
+        },
+        onError: (streamErr) => {
+          console.error('Streaming error in AskPastSelf:', streamErr);
+          setErrorMessage(streamErr?.message || 'Error occurred while streaming reflection.');
+        },
+      });
+
+      // Mark streaming completed for this item
+      setQaHistory((prev) =>
+        prev.map((item) =>
+          item.id === currentQaId ? { ...item, isStreaming: false } : item
+        )
+      );
     } catch (err: any) {
       console.error('Ask Past Self error:', err);
       setErrorMessage(err?.message || 'Failed to retrieve grounded reflection. Please try again.');
@@ -244,8 +284,8 @@ export const AskPastSelf: React.FC<AskPastSelfProps> = ({
         )}
       </div>
 
-      {/* Loading Placeholder */}
-      {isLoading && (
+      {/* Loading Placeholder (only active during initial vector embedding and retrieval before card is mounted) */}
+      {isLoading && !qaHistory.some((qa) => qa.isStreaming) && (
         <div className="bg-[#FFFFFF] border border-[#DFCBA8] rounded-2xl p-8 text-center space-y-3 shadow-xs animate-pulse">
           <div className="w-12 h-12 rounded-full bg-[#F5EFE6] flex items-center justify-center mx-auto text-[#8C5E24]">
             <Loader2 className="w-6 h-6 animate-spin" />
@@ -305,14 +345,24 @@ export const AskPastSelf: React.FC<AskPastSelfProps> = ({
                     <span>Model: {qa.modelUsed}</span>
                     <span>•</span>
                     <span className="text-[#593A12] font-bold">{qa.retrievedSources.length} sources referenced</span>
+                    {qa.isStreaming && (
+                      <>
+                        <span>•</span>
+                        <span className="text-[#8C5E24] font-bold animate-pulse flex items-center gap-1.5 font-sans">
+                          <span className="w-2 h-2 rounded-full bg-[#8C5E24] inline-block" />
+                          Reflecting...
+                        </span>
+                      </>
+                    )}
                   </div>
                 </div>
               </div>
 
               <button
-                onClick={() => handleCopy(qa.id, qa.answer)}
+                onClick={() => qa.answer && handleCopy(qa.id, qa.answer)}
+                disabled={!qa.answer || qa.isStreaming}
                 title="Copy Answer"
-                className="p-2.5 text-[#4D453B] hover:text-[#1F1D1A] hover:bg-[#FAF8F5] rounded-lg transition-colors cursor-pointer"
+                className="p-2.5 text-[#4D453B] hover:text-[#1F1D1A] hover:bg-[#FAF8F5] disabled:opacity-30 disabled:cursor-not-allowed rounded-lg transition-colors cursor-pointer"
               >
                 {copiedId === qa.id ? <Check className="w-5 h-5 text-[#8C5E24]" /> : <Copy className="w-5 h-5" />}
               </button>
@@ -321,19 +371,35 @@ export const AskPastSelf: React.FC<AskPastSelfProps> = ({
             {/* Grounded AI Answer */}
             <div className="flex items-start gap-3.5">
               <div className="w-8 h-8 rounded-lg bg-[#F5EFE6] border border-[#DFCBA8] text-[#593A12] flex items-center justify-center font-bold text-sm shrink-0 mt-0.5">
-                <Sparkles className="w-4.5 h-4.5 text-[#8C5E24]" />
+                {qa.isStreaming ? (
+                  <Loader2 className="w-4.5 h-4.5 text-[#8C5E24] animate-spin" />
+                ) : (
+                  <Sparkles className="w-4.5 h-4.5 text-[#8C5E24]" />
+                )}
               </div>
               <div className="flex-1 text-base sm:text-lg text-[#1F1D1A] leading-relaxed space-y-3 prose prose-stone max-w-none">
-                <ReactMarkdown
-                  components={{
-                    p: ({ node, ...props }) => <p className="mb-2 last:mb-0 text-[#1F1D1A] leading-relaxed font-normal" {...props} />,
-                    strong: ({ node, ...props }) => <strong className="font-bold text-[#1F1D1A] bg-[#F5EFE6] px-1.5 py-0.5 rounded border border-[#DFCBA8]" {...props} />,
-                    ul: ({ node, ...props }) => <ul className="list-disc pl-5 space-y-1.5 mb-3 text-[#24201C]" {...props} />,
-                    li: ({ node, ...props }) => <li className="text-[#24201C]" {...props} />,
-                  }}
-                >
-                  {qa.answer}
-                </ReactMarkdown>
+                {qa.answer ? (
+                  <>
+                    <ReactMarkdown
+                      components={{
+                        p: ({ node, ...props }) => <p className="mb-2 last:mb-0 text-[#1F1D1A] leading-relaxed font-normal" {...props} />,
+                        strong: ({ node, ...props }) => <strong className="font-bold text-[#1F1D1A] bg-[#F5EFE6] px-1.5 py-0.5 rounded border border-[#DFCBA8]" {...props} />,
+                        ul: ({ node, ...props }) => <ul className="list-disc pl-5 space-y-1.5 mb-3 text-[#24201C]" {...props} />,
+                        li: ({ node, ...props }) => <li className="text-[#24201C]" {...props} />,
+                      }}
+                    >
+                      {qa.answer}
+                    </ReactMarkdown>
+                    {qa.isStreaming && (
+                      <span className="inline-block w-1.5 h-4 bg-[#8C5E24] ml-1 animate-pulse align-middle" />
+                    )}
+                  </>
+                ) : (
+                  <div className="flex items-center gap-2 text-sm text-[#8C5E24] font-medium py-1 animate-pulse">
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                    <span>Synthesizing grounded reflection from your entries...</span>
+                  </div>
+                )}
               </div>
             </div>
 

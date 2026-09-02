@@ -681,23 +681,75 @@ ${formattedContext}
 
 Please provide a thoughtful, grounded answer to the user's question based on their past journal entries above:`;
 
-    const result = await generateContentWithFallback({
-      contents: [{ role: 'user', parts: [{ text: userPrompt }] }],
-      systemInstruction,
-      temperature: 0.4,
+    const ai = getGeminiClient();
+    let stream: any = null;
+    let selectedModel = MODEL_FALLBACK_LADDER[0];
+    let startError: any = null;
+
+    // Resilient fallback ladder to establish stream
+    for (const model of MODEL_FALLBACK_LADDER) {
+      try {
+        stream = await ai.models.generateContentStream({
+          model,
+          contents: [{ role: 'user', parts: [{ text: userPrompt }] }],
+          config: {
+            systemInstruction,
+            temperature: 0.4,
+          },
+        });
+        selectedModel = model;
+        break;
+      } catch (err: any) {
+        console.warn(`[Streaming Fallback] Model ${model} failed to start stream:`, err?.message || err);
+        startError = err;
+      }
+    }
+
+    if (!stream) {
+      throw new Error(`Failed to initialize streaming model. ${startError?.message || ''}`);
+    }
+
+    // Set SSE headers only after stream initialization succeeds (avoids prematurely sent headers)
+    res.writeHead(200, {
+      'Content-Type': 'text/event-stream',
+      'Cache-Control': 'no-cache, no-transform',
+      'Connection': 'keep-alive',
+      'X-Accel-Buffering': 'no',
     });
 
-    return res.json({
-      answer: result.text,
-      modelUsed: result.modelUsed,
-      retrievedCount: contextEntries.length,
-      timestamp: new Date().toISOString(),
-    });
+    // Notify client of stream start and model used
+    res.write(`data: ${JSON.stringify({ type: 'start', modelUsed: selectedModel, retrievedCount: contextEntries.length })}\n\n`);
+
+    // Stream chunks as they arrive using chunk.text (getter property in @google/genai SDK)
+    for await (const chunk of stream) {
+      if (res.writableEnded || res.closed) {
+        break;
+      }
+      const text = chunk.text;
+      if (text) {
+        res.write(`data: ${JSON.stringify({ type: 'chunk', text })}\n\n`);
+      }
+    }
+
+    if (!res.writableEnded && !res.closed) {
+      res.write(`data: ${JSON.stringify({ type: 'done', modelUsed: selectedModel })}\n\n`);
+      res.end();
+    }
   } catch (error: any) {
     console.error('Error in /api/gemini/ask-past-self:', error);
-    return res.status(500).json({
-      error: error?.message || 'Failed to process question with your past self',
-    });
+    // Properly handle errors depending on whether headers were already committed
+    if (res.headersSent) {
+      try {
+        res.write(`data: ${JSON.stringify({ type: 'error', error: error?.message || 'Error occurred during generation stream' })}\n\n`);
+        res.end();
+      } catch {
+        // Response already closed
+      }
+    } else {
+      return res.status(500).json({
+        error: error?.message || 'Failed to process question with your past self',
+      });
+    }
   }
 });
 

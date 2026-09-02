@@ -127,10 +127,19 @@ export interface AskPastSelfResponse {
   timestamp: string;
 }
 
-export async function requestGeminiAskPastSelf(
+export interface AskPastSelfStreamCallbacks {
+  onStart?: (meta: { modelUsed: string; retrievedCount: number }) => void;
+  onChunk: (text: string) => void;
+  onDone?: (meta: { modelUsed: string }) => void;
+  onError?: (error: Error) => void;
+}
+
+export async function requestGeminiAskPastSelfStream(
   question: string,
-  contextEntries: ContextEntryPayload[]
-): Promise<AskPastSelfResponse> {
+  contextEntries: ContextEntryPayload[],
+  callbacks: AskPastSelfStreamCallbacks,
+  signal?: AbortSignal
+): Promise<void> {
   const response = await fetch('/api/gemini/ask-past-self', {
     method: 'POST',
     headers: {
@@ -140,6 +149,7 @@ export async function requestGeminiAskPastSelf(
       question,
       contextEntries,
     }),
+    signal,
   });
 
   if (!response.ok) {
@@ -147,7 +157,87 @@ export async function requestGeminiAskPastSelf(
     throw new Error(errData.error || `Server responded with status ${response.status}`);
   }
 
-  return response.json();
+  if (!response.body) {
+    throw new Error('ReadableStream not supported by client environment.');
+  }
+
+  const reader = response.body.getReader();
+  const decoder = new TextDecoder('utf-8');
+  let buffer = '';
+
+  try {
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+
+      buffer += decoder.decode(value, { stream: true });
+      const lines = buffer.split('\n');
+      buffer = lines.pop() || '';
+
+      for (const line of lines) {
+        const trimmed = line.trim();
+        if (!trimmed || !trimmed.startsWith('data:')) continue;
+        const payloadStr = trimmed.slice(5).trim();
+        if (!payloadStr) continue;
+
+        try {
+          const payload = JSON.parse(payloadStr);
+          if (payload.type === 'start') {
+            callbacks.onStart?.({
+              modelUsed: payload.modelUsed,
+              retrievedCount: payload.retrievedCount,
+            });
+          } else if (payload.type === 'chunk' && typeof payload.text === 'string') {
+            callbacks.onChunk(payload.text);
+          } else if (payload.type === 'done') {
+            callbacks.onDone?.({
+              modelUsed: payload.modelUsed,
+            });
+          } else if (payload.type === 'error') {
+            const streamErr = new Error(payload.error || 'Server error during generation stream');
+            callbacks.onError?.(streamErr);
+            throw streamErr;
+          }
+        } catch (jsonErr: any) {
+          if (jsonErr.message && payloadStr.includes(jsonErr.message)) {
+            throw jsonErr;
+          }
+          console.warn('Failed to parse SSE payload:', payloadStr, jsonErr);
+        }
+      }
+    }
+  } finally {
+    reader.releaseLock();
+  }
+}
+
+export async function requestGeminiAskPastSelf(
+  question: string,
+  contextEntries: ContextEntryPayload[]
+): Promise<AskPastSelfResponse> {
+  let answer = '';
+  let modelUsed = 'gemini-3.6-flash';
+  let retrievedCount = contextEntries.length;
+
+  await requestGeminiAskPastSelfStream(question, contextEntries, {
+    onStart: (meta) => {
+      modelUsed = meta.modelUsed;
+      retrievedCount = meta.retrievedCount;
+    },
+    onChunk: (text) => {
+      answer += text;
+    },
+    onDone: (meta) => {
+      modelUsed = meta.modelUsed;
+    },
+  });
+
+  return {
+    answer,
+    modelUsed,
+    retrievedCount,
+    timestamp: new Date().toISOString(),
+  };
 }
 
 export async function requestGoogleBookCover(title: string, author?: string, tag?: string) {
