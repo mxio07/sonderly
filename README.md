@@ -198,7 +198,7 @@ The challenge baseline provides: Firebase Auth, multi-turn Gemini chat, user-iso
 
 ## 📄 License
 
-[Choose a license — e.g. MIT — see note below]
+This project is licensed under the MIT License — see the LICENSE file for details.
 
 ---
 
